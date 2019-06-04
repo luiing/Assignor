@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical" android:layout_width="match_parent"
+    android:layout_height="match_parent">
+    <Button android:id="@+id/bt_action_a"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ActionA"
+        />
+    <Button android:id="@+id/bt_action_b"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="ActionB"
+        />
+    <Button android:id="@+id/bt_action_c"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:text="ActionA No Cache"
+    />
+    <Button android:id="@+id/bt_cache_a"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CacheA"
+        android:visibility="gone"
+        />
+    <Button android:id="@+id/bt_cache_b"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="CacheB"
+        />
+    <Button android:id="@+id/bt_multith"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="MultithThread"
+        />
+    <Button android:id="@+id/bt_start"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="StartActivity"
+        />
+    <TextView android:id="@+id/tv_content"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+</LinearLayout>
