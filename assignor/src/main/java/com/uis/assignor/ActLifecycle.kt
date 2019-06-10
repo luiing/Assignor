@@ -4,13 +4,13 @@
  * Github: https://github.com/luiing
  */
 
-package com.uis.assignor.callable
+package com.uis.assignor
 
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 
-open class ActLifecycle : Application.ActivityLifecycleCallbacks {
+class ActLifecycle : Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
 
     }

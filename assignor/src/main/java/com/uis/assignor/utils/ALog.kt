@@ -10,18 +10,22 @@ import android.util.Log
 
 object ALog {
 
+    @JvmStatic
     private var debug = false
 
+    @JvmStatic
     fun enableLog() {
         debug = true
     }
 
+    @JvmStatic
     fun printStackTrace(ex: Throwable) {
         if (debug) {
             ex.printStackTrace()
         }
     }
 
+    @JvmStatic
     fun printStack(msg: String) {
         if (!debug) {
             return
@@ -41,6 +45,7 @@ object ALog {
         print(builder.append(msg).toString())
     }
 
+    @JvmStatic
     fun print(msg: String) {
         if (!debug) {
             return
@@ -60,6 +65,7 @@ object ALog {
         }
     }
 
+    @JvmStatic
     fun printStack() {
         if (!debug) {
             return

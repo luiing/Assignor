@@ -14,5 +14,6 @@
                 <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
         </activity>
+        <activity android:name="com.uis.conn.ui.DemoUi"/>
     </application>
 </manifest>

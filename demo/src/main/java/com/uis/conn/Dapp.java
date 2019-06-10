@@ -1,6 +1,9 @@
 package com.uis.conn;
 
 import android.app.Application;
+import android.arch.lifecycle.LiveData;
+import android.arch.lifecycle.ViewModel;
+import android.support.annotation.WorkerThread;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
 import com.uis.connector.comm.Clog;
@@ -13,6 +16,5 @@ public class Dapp extends Application {
         Clog.enableLog();
         ConnPlant.setApp(this);
         Fresco.initialize(this);
-        //Clog.print("w="+getResources().getDisplayMetrics().widthPixels+",h="+getResources().getDisplayMetrics().heightPixels);
     }
 }
