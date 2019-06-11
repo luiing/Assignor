@@ -9,6 +9,7 @@ import android.os.SystemClock;
 import android.support.annotation.Nullable;
 import android.support.v4.app.FragmentActivity;
 import android.support.v7.app.AppCompatActivity;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
@@ -21,6 +22,9 @@ import com.uis.connector.comm.Clog;
 import com.uis.connector.comm.ConnPlant;
 import com.uis.connector.demo.R;
 import com.uis.conn.observer.MainConn;
+
+import kotlin.Unit;
+import kotlin.jvm.functions.Function0;
 
 public class MainUi extends AppCompatActivity implements View.OnClickListener,MainView {
 
@@ -51,7 +55,6 @@ public class MainUi extends AppCompatActivity implements View.OnClickListener,Ma
         LifecycleObserver observer = new MainLifecycle();
         getLifecycle().addObserver(observer);
         action.attachActivity(this);
-        //Clog.printStack(TAG);
     }
 
     @Override
@@ -59,8 +62,12 @@ public class MainUi extends AppCompatActivity implements View.OnClickListener,Ma
         int id = v.getId();
         if(R.id.bt_action_a == id){
             action.actionA();
+            Intent it = new Intent(this,DemoUi.class);
+            startActivity(it);
         }else if(R.id.bt_action_b == id){
             action.actionB();
+            Intent it = new Intent(this,MainUi.class);
+            startActivity(it);
         }else if(R.id.bt_action_c == id){
             action.actionC();
         }else if(R.id.bt_cache_a == id){
