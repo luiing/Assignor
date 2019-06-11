@@ -10,10 +10,13 @@ import android.app.Activity
 import android.os.Bundle
 import android.os.SystemClock
 import com.uis.assignor.utils.ALog
+import com.uis.assignor.utils.TypeConvert
+import com.uis.assignor.utils.TypeParam
 import com.uis.assignor.works.AsyncResult
 import com.uis.assignor.works.Worker
 import com.uis.connector.demo.R
 import kotlinx.android.synthetic.main.ui_main.*
+import java.util.ArrayList
 
 /**
  * @autho uis
@@ -21,18 +24,36 @@ import kotlinx.android.synthetic.main.ui_main.*
  * @github https://github.com/luiing
  */
 class DemoUi :Activity() {
+
+    val agent = DemoAgent()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        agent.attach(this)
         setContentView(R.layout.ui_main)
         bt_action_a.setOnClickListener{
-            syncCall()
+            //syncCall()
+            agent.int()
         }
         bt_action_b.setOnClickListener {
-            asyncCall()
+            //asyncCall()
+            agent.string("action clicked")
         }
         bt_action_c.setOnClickListener {
-            both()
+            //both()
+            agent.list()
         }
+        agent.string("created...")
+    }
+
+    override fun onResume() {
+        super.onResume()
+        //agent.string("onResume")
+    }
+
+    override fun onPause() {
+        super.onPause()
+        agent.string("onPause")
     }
 
     fun asyncCall(){

@@ -38,15 +38,15 @@ class AsyncWorkImpl :IAsyncWork{
             }
             val result = CopyOnWriteArrayList<AsyncResult>()
             while (atomic.get() > 0)
-                deque.poll()?.let {
+                deque.poll()?.apply {
                     Worker.ioExecute {
-                        kotlin.runCatching {  result.add(it())}.exceptionOrNull()?.apply { printStackTrace() }
+                        kotlin.runCatching {  result.add(this())}.exceptionOrNull()?.apply { printStackTrace() }
                         if(0 == atomic.decrementAndGet()){
                             work(result)
                             deque.clear()
                         }
                     }
-                    return@let
+                    return@apply
                 }
         }
     }
