@@ -13,5 +13,7 @@ package com.uis.assignor.works
 interface ISyncWork {
     fun sync(work :(Any?)->Any) :ISyncWork
 
+    fun syncSize(size :Int) :ISyncWork
+
     fun done(work :(Any?)->Unit)
 }

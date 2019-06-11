@@ -1,20 +1,16 @@
 package com.uis.conn;
 
 import android.app.Application;
-import android.arch.lifecycle.LiveData;
-import android.arch.lifecycle.ViewModel;
-import android.support.annotation.WorkerThread;
+import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
-import com.uis.connector.comm.Clog;
-import com.uis.connector.comm.ConnPlant;
+import com.uis.assignor.utils.ALog;
 
 public class Dapp extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Clog.enableLog();
-        ConnPlant.setApp(this);
+        ALog.enableLog(Log.DEBUG);
         Fresco.initialize(this);
     }
 }
