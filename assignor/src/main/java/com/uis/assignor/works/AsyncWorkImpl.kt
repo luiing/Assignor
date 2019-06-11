@@ -18,22 +18,36 @@ class AsyncWorkImpl :IAsyncWork{
 
     private val deque = LinkedBlockingDeque<()->AsyncResult>()
 
+    private val atomic = AtomicInteger(-1)
+
     override fun async(work: () -> AsyncResult): IAsyncWork {
         deque.offer(work)
         return this
     }
 
+    override fun asyncSize(size: Int): IAsyncWork {
+        this.atomic.set(size)
+        return this
+    }
+
     override fun done(work: (MutableList<AsyncResult>) -> Unit) {
-        val cnt = AtomicInteger(deque.size)
-        val result = CopyOnWriteArrayList<AsyncResult>()
-        while (deque.isNotEmpty())
-            deque.poll()?.let {
-                Worker.ioExecute {
-                    kotlin.runCatching {  result.add(it())}.exceptionOrNull()?.apply { printStackTrace() }
-                    if(0 == cnt.decrementAndGet()){
-                        work(result)
-                    }
-                }
+        Worker.ioExecute {
+            /** 当设置了size,以设置size为准*/
+            if(-1 == atomic.get()){
+                atomic.set(deque.size)
             }
+            val result = CopyOnWriteArrayList<AsyncResult>()
+            while (atomic.get() > 0)
+                deque.poll()?.let {
+                    Worker.ioExecute {
+                        kotlin.runCatching {  result.add(it())}.exceptionOrNull()?.apply { printStackTrace() }
+                        if(0 == atomic.decrementAndGet()){
+                            work(result)
+                            deque.clear()
+                        }
+                    }
+                    return@let
+                }
+        }
     }
 }

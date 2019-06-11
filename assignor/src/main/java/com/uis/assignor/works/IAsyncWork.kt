@@ -13,6 +13,8 @@ package com.uis.assignor.works
 interface IAsyncWork {
     fun async(work :()->AsyncResult) :IAsyncWork
 
+    fun asyncSize(size :Int) :IAsyncWork
+
     fun done(work :(MutableList<AsyncResult>)->Unit)
 
 }

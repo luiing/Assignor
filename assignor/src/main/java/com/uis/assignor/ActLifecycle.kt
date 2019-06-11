@@ -10,7 +10,7 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 
-class ActLifecycle : Application.ActivityLifecycleCallbacks {
+open class ActLifecycle : Application.ActivityLifecycleCallbacks {
     override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
 
     }
