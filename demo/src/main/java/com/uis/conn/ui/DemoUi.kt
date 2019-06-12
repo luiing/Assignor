@@ -10,14 +10,12 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
+import com.uis.assignor.Assignor
 import com.uis.assignor.utils.ALog
-import com.uis.assignor.utils.TypeConvert
-import com.uis.assignor.utils.TypeParam
 import com.uis.assignor.works.AsyncResult
 import com.uis.assignor.works.Worker
 import com.uis.connector.demo.R
 import kotlinx.android.synthetic.main.ui_main.*
-import java.util.ArrayList
 
 /**
  * @autho uis
@@ -25,33 +23,70 @@ import java.util.ArrayList
  * @github https://github.com/luiing
  */
 class DemoUi :Activity() {
-
-    val agent = DemoAgent()
-
+    val model = Assignor.of(this).get(DemoModel::class.java)
+    val test = Assignor.of(this).get(TestModel::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        agent.attach(this)
-        agent.string("init created...")
         super.onCreate(savedInstanceState)
+        test.stringBody.setValue("onCreated....")
         setContentView(R.layout.ui_main)
+
+        test.stringBody.addObserver {data->
+            ALog.e("string data= $data")
+        }
+
+        model.intBody.addObserver{data->
+            ALog.e("int data= $data")
+        }
+
+        model.demoBody.addObserver { data->
+            ALog.e("demo body data = $data")
+        }
+
+        model.intBody.addObserver{data->
+            ALog.e("int data2= $data")
+        }
+
+        model.stringBody.addObserver{data->
+            ALog.e("string data= $data")
+        }
+        model.listBody.addObserver{data->
+            ALog.e("list data= ${data.toString()}")
+        }
+
         bt_action_a.setOnClickListener{
             //syncCall()
-            agent.int()
-            Worker.ioExecute {
-                SystemClock.sleep(5000)
-                agent.string("sleep 5000")
-            }
+            model.intBody.setValue(10)
             val it = Intent(this, DemoUi::class.java)
             startActivity(it)
         }
         bt_action_b.setOnClickListener {
             //asyncCall()
-            agent.string("action clicked")
+            test.stringBody.setValue("action clicked test1")
+            model.demoBody.setValue(1000)
         }
         bt_action_c.setOnClickListener {
             //both()
-            agent.list()
+            val list = ArrayList<String>()
+            list.add("001")
+            list.add("002")
+            model.listBody.setValue(list)
         }
+        Worker.ioExecute {
+            SystemClock.sleep(3000)
+            test.stringBody.setValue("ioExecute")
+        }
+    }
+
+    override fun onResume() {
+        ALog.e("onResume")
+        super.onResume()
+
+    }
+
+    override fun onDestroy() {
+        test.stringBody.setValue("test onDestroy")
+        super.onDestroy()
     }
 
     fun asyncCall(){

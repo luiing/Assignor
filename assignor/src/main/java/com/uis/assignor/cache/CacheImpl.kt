@@ -14,7 +14,7 @@ import java.io.File
 import java.util.concurrent.locks.ReadWriteLock
 import java.util.concurrent.locks.ReentrantReadWriteLock
 
-class CacheImpl(private var parent:File?, private var maxSize :Int= MAX_CACHE_SIZE)  {
+class CacheImpl(private var parent:File?, private var maxSize :Int= MAX_CACHE_SIZE):Cache {
 
     private val locks: LruCache<String, ReadWriteLock>
     private val lruCache: LruCache<String, CacheEntity>
@@ -45,6 +45,14 @@ class CacheImpl(private var parent:File?, private var maxSize :Int= MAX_CACHE_SI
         }
     }
 
+    override fun readCache() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
+    override fun writeCache() {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     private fun getLock(key: String): ReadWriteLock {
         var lock = locks.get(key)
         if(lock == null){
@@ -67,6 +75,4 @@ class CacheImpl(private var parent:File?, private var maxSize :Int= MAX_CACHE_SI
         }
         return path
     }
-
-
 }

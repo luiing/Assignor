@@ -20,7 +20,7 @@ import com.uis.assignor.utils.ALog
 
 object Assignor {
 
-    private data class StateObservable(var code: Int, var observable: AssignorAgent?)
+    private data class StateObservable(var code: Int, var store: BodyStore?)
     private var app: Application? = null
     private var observables = ArrayMap<Int, StateObservable>()
 
@@ -33,31 +33,31 @@ object Assignor {
                     application.registerActivityLifecycleCallbacks(object : ActLifecycle() {
                         override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {
                             activity?.hashCode()?.apply {
-                                _stateChange(this, State_Created)
+                                stateChange(this, State_Created)
                             }
                         }
 
                         override fun onActivityResumed(activity: Activity?) {
                             activity?.hashCode()?.apply {
-                                _stateChange(this, State_Resumed)
+                                stateChange(this, State_Resumed)
                             }
                         }
 
                         override fun onActivityPaused(activity: Activity?) {
                             activity?.hashCode()?.apply {
-                                _stateChange(this, State_Paused)
+                                stateChange(this, State_Paused)
                             }
                         }
 
                         override fun onActivitySaveInstanceState(activity: Activity?, outState: Bundle?) {
                             activity?.hashCode()?.apply {
-                                _stateChange(this, State_SaveInstance)
+                                stateChange(this, State_SaveInstance)
                             }
                         }
 
                         override fun onActivityDestroyed(activity: Activity?) {
                             activity?.hashCode()?.apply {
-                                _stateChange(this, State_Destroy)
+                                stateChange(this, State_Destroy)
                             }
                         }
                     })
@@ -66,8 +66,8 @@ object Assignor {
         }
     }
 
-    private fun _stateChange(code: Int, state: Int) {
-        observables[code]?.observable?.apply {
+    internal fun stateChange(code: Int, state: Int) {
+        observables[code]?.store?.apply {
             onStateChanged(state)
             if (State_Destroy == state) {
                 observables.remove(code)
@@ -75,31 +75,32 @@ object Assignor {
         }
     }
 
-    private fun _init(code: Int): AssignorAgent{
-        return observables[code]?.observable ?:  {obs: AssignorAgent->
-            observables[code] =  StateObservable(code, obs)
-            obs
-        }(AssignorAgent())
+    internal fun init(code: Int): BodyStore{
+        return observables[code]?.store ?:  {store: BodyStore->
+            observables[code] =  StateObservable(code, store)
+            store
+        }(BodyStore())
     }
 
     @JvmStatic
-    fun attach(activity: Activity): AssignorAgent {
-        activity.apply {
-            init(application)
+    fun of(activity: Activity): BodyStore {
+        activity.application?.apply {
+            init(this)
+            ALog.e("Assignor init")
         }
-        return _init(activity.hashCode())
+        return init(activity.hashCode())
     }
 
     /**
      * @param code see [Activity.hashCode]
      */
     @JvmStatic
-    fun agent(code:Int):AssignorAgent?{
-        return observables[code]?.observable
+    fun of(code:Int):BodyStore?{
+        return observables[code]?.store
     }
 
     @JvmStatic
-    fun<T:AssignorOwner> createOwner(cls :Class<T>) :T{
+    fun<T:BodyModel> createModel(cls :Class<T>) :T{
         return cls.newInstance()
     }
 }

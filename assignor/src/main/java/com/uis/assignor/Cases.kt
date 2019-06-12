@@ -40,7 +40,3 @@ data class CacheEntity(val arg:Any?, var mills:Long = System.currentTimeMillis()
     }
 }
 
-data class ErrorEntity(var code :Int=0,var error :String="",var other :String="")
-
-
-data class AssignorResult<T>(var result :T?, var cacheKey: String = "", var isCache:Boolean = false)

@@ -40,7 +40,7 @@ class AsyncWorkImpl :IAsyncWork{
             while (atomic.get() > 0)
                 deque.poll()?.apply {
                     Worker.ioExecute {
-                        kotlin.runCatching {  result.add(this())}.exceptionOrNull()?.apply { printStackTrace() }
+                        kotlin.runCatching {  result.add(this())}.exceptionOrNull()?. printStackTrace()
                         if(0 == atomic.decrementAndGet()){
                             work(result)
                             deque.clear()

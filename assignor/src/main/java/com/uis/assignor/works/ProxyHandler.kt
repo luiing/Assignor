@@ -15,7 +15,7 @@ import java.lang.reflect.Proxy
  * @author uis 2019/5/10
  */
 @Suppress("unchecked_cast")
-class ProxyHandler<T :Any>(protected var target: T) : InvocationHandler {
+open class ProxyHandler<T :Any>(protected var target: T) : InvocationHandler {
 
     private val mclassLoader: ClassLoader? get() = target::class.java.classLoader
 
@@ -24,11 +24,11 @@ class ProxyHandler<T :Any>(protected var target: T) : InvocationHandler {
     fun proxy() = Proxy.newProxyInstance(mclassLoader, minterfaces, this) as T
 
 
-    fun beforeInvoke(method: Method, vararg args:Any){}
+    open fun beforeInvoke(method: Method, vararg args:Any){}
 
     operator fun invoke(method: Method, vararg args:Any) = method.invoke(target, args)
 
-    fun afterInvoke(method: Method,result:Any, vararg args:Any){}
+    open fun afterInvoke(method: Method,result:Any, vararg args:Any){}
 
     override fun invoke(proxy: Any, method: Method, vararg args:Any): Any{
         beforeInvoke(method, args)
