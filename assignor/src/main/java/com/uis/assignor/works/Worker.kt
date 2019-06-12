@@ -7,6 +7,9 @@
 package com.uis.assignor.works
 import android.os.Handler
 import android.os.Looper
+import com.uis.assignor.cache.Cache
+import com.uis.assignor.cache.CacheImpl
+import java.io.File
 import java.util.concurrent.Executors
 
 object Worker{
@@ -32,7 +35,7 @@ object Worker{
     private fun mainCall(call :()->Unit):()->Unit = {
         kotlin.runCatching {
             call()
-        }.exceptionOrNull()?.apply { printStackTrace() }
+        }.exceptionOrNull()?.printStackTrace()
     }
 
     @JvmStatic
@@ -40,7 +43,7 @@ object Worker{
         io.submit{
             kotlin.runCatching {
                 call()
-            }.exceptionOrNull()?.apply { printStackTrace() }
+            }.exceptionOrNull()?.printStackTrace()
         }
     }
 
@@ -54,4 +57,7 @@ object Worker{
     fun <T :Any> proxyInstance(handler: ProxyHandler<T>): T? {
         return handler.proxy()
     }
+
+    @JvmStatic
+    fun cache(parent : File):Cache = CacheImpl(parent)
 }

@@ -4,6 +4,7 @@ import android.app.Application;
 import android.util.Log;
 
 import com.facebook.drawee.backends.pipeline.Fresco;
+import com.uis.assignor.Assignor;
 import com.uis.assignor.utils.ALog;
 
 public class Dapp extends Application {
@@ -12,5 +13,6 @@ public class Dapp extends Application {
         super.onCreate();
         ALog.enableLog(Log.DEBUG);
         Fresco.initialize(this);
+        Assignor.init(this);
     }
 }

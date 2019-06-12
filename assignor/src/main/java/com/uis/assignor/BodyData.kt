@@ -2,22 +2,21 @@ package com.uis.assignor
 
 import android.support.v4.util.ArrayMap
 import com.uis.assignor.utils.ALog
-import com.uis.assignor.utils.TypeConvert
 import com.uis.assignor.works.Worker
 
-open class AssignorBody<T :Any> :AssignorState{
+open class BodyData<T :Any> :IState{
     companion object{
         @JvmStatic private val NONE = Any()
         @JvmStatic private val VERSION_NONE = -1
     }
 
-    private data class ItemObserver<I>(var version:Int= VERSION_NONE,var owner: AssignorOwner,var observer: AssignorObserver<I>)
+    private data class ItemObserver<I>(var version:Int= VERSION_NONE,var observer: (I)->Unit)
 
-    private val observers = ArrayMap<AssignorObserver<T>,ItemObserver<T>>()
+    private val postLock = Any()
+    private val observers = ArrayMap<((T)->Unit),ItemObserver<T>>()
     @Volatile private var mState = State_Created
     @Volatile private var postValue = NONE
-    private val postLock = Any()
-    private var value :Any = NONE
+    @Volatile private var value :Any = NONE
     private var mVersion = VERSION_NONE
 
     @Suppress("UNCHECKED_CAST")
@@ -37,7 +36,7 @@ open class AssignorBody<T :Any> :AssignorState{
                 removeObservers()
             }
             State_Resumed->{
-                _notifyDataChanged()
+                notifyDataChanged()
             }else->{
 
             }
@@ -46,9 +45,11 @@ open class AssignorBody<T :Any> :AssignorState{
 
     fun setValue(v :T){
         if(Worker.isMainThread()) {
-            value = v
             mVersion++
-            _notifyDataChanged()
+            value = v
+            kotlin.runCatching{
+                notifyDataChanged()
+            }.exceptionOrNull()?.printStackTrace()
         }else{
             val canPost:Boolean
             synchronized(postLock){
@@ -62,25 +63,24 @@ open class AssignorBody<T :Any> :AssignorState{
     }
 
     @Suppress("UNCHECKED_CAST")
-    private fun _notifyDataChanged(){
+    internal fun notifyDataChanged(){
         if(State_Resumed == this.mState && value != NONE){
             for (item in observers.values){
                 if(item.version < mVersion && State_Resumed == this.mState){
                     item.version = mVersion
-                    item.observer.onDataChanged(value as T)
+                    item.observer(value as T)
                 }
             }
         }
     }
 
-    fun addObserver(owner: AssignorOwner,observer: AssignorObserver<T>){
+    fun addObserver(observer: (T)->Unit){
         if(!observers.containsKey(observer)){
-            owner.addState(this)
-            observers[observer] = ItemObserver(owner = owner,observer = observer)
+            observers[observer] = ItemObserver(observer = observer)
         }
     }
 
-    private fun removeObservers(){
+    internal fun removeObservers(){
         observers.clear()
     }
 }

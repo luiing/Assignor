@@ -6,6 +6,6 @@
 
 package com.uis.assignor
 
-interface AssignorState {
+interface IState {
     fun onStateChanged(state :Int)
 }
