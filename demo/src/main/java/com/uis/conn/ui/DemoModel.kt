@@ -8,7 +8,6 @@ package com.uis.conn.ui
 
 import com.uis.assignor.BodyModel
 import com.uis.assignor.BodyData
-import com.uis.assignor.BodyObserver
 import com.uis.assignor.utils.ALog
 
 /**
