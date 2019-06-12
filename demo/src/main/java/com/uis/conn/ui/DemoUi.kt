@@ -28,9 +28,10 @@ class DemoUi :Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        test.stringBody.setValue("onCreated....")
+
         setContentView(R.layout.ui_main)
 
+        test.stringBody.setValue("onCreated....")
         test.stringBody.addObserver {data->
             ALog.e("string data= $data")
         }
@@ -62,7 +63,10 @@ class DemoUi :Activity() {
         }
         bt_action_b.setOnClickListener {
             //asyncCall()
-            test.stringBody.setValue("action clicked test1")
+            Worker.ioExecute {
+                test.stringBody.setValue("action clicked test1")
+            }
+
             model.demoBody.setValue(1000)
         }
         bt_action_c.setOnClickListener {
@@ -71,6 +75,8 @@ class DemoUi :Activity() {
             list.add("001")
             list.add("002")
             model.listBody.setValue(list)
+
+            ALog.e("cache value: "+test.stringBody.getValue()?.toString())
         }
         Worker.ioExecute {
             SystemClock.sleep(3000)

@@ -6,7 +6,6 @@ import com.uis.assignor.works.Worker
 
 open class BodyData<T :Any> :IState{
     companion object{
-        @JvmStatic private val NONE = Any()
         @JvmStatic private val VERSION_NONE = -1
     }
 
@@ -15,18 +14,20 @@ open class BodyData<T :Any> :IState{
     private val postLock = Any()
     private val observers = ArrayMap<((T)->Unit),ItemObserver<T>>()
     @Volatile private var mState = State_Created
-    @Volatile private var postValue = NONE
-    @Volatile private var value :Any = NONE
-    private var mVersion = VERSION_NONE
-
+    @Volatile private var postValue :Any? = null
+    @Volatile private var mValue :Any? = postValue
+    @Volatile private var mVersion = VERSION_NONE
+    
     @Suppress("UNCHECKED_CAST")
     private val postCall :()->Unit = {
-        val v:Any
         synchronized(postLock){
-            v = postValue
-            postValue = NONE
+            val v = postValue
+            postValue = null
+            (v as? T)?.apply {
+                setValue(this)
+            }
+            return@synchronized
         }
-        setValue(v as T)
     }
 
     override fun onStateChanged(state: Int) {
@@ -37,23 +38,29 @@ open class BodyData<T :Any> :IState{
             }
             State_Resumed->{
                 notifyDataChanged()
-            }else->{
-
             }
         }
+    }
+
+    /**
+     * @return 获取缓存value
+     */
+    @Suppress("unchecked_cast")
+    fun getValue() :T?{
+        return mValue as? T
     }
 
     fun setValue(v :T){
         if(Worker.isMainThread()) {
             mVersion++
-            value = v
+            mValue = v
             kotlin.runCatching{
                 notifyDataChanged()
             }.exceptionOrNull()?.printStackTrace()
         }else{
             val canPost:Boolean
             synchronized(postLock){
-                canPost = postValue == NONE
+                canPost = postValue == null
                 postValue = v
             }
             if(canPost) {
@@ -64,11 +71,13 @@ open class BodyData<T :Any> :IState{
 
     @Suppress("UNCHECKED_CAST")
     internal fun notifyDataChanged(){
-        if(State_Resumed == this.mState && value != NONE){
-            for (item in observers.values){
-                if(item.version < mVersion && State_Resumed == this.mState){
-                    item.version = mVersion
-                    item.observer(value as T)
+        if(State_Resumed == this.mState){
+            mValue?.apply {
+                for (item in observers.values) {
+                    if (item.version < mVersion && State_Resumed == mState) {
+                        item.version = mVersion
+                        item.observer(this as T)
+                    }
                 }
             }
         }
