@@ -14,8 +14,10 @@ import java.lang.reflect.Type
  */
 object TypeConvert {
 
+    @JvmStatic
     fun convert(target: Any): Type? = convertAll(target)?.let { it[0] }
 
+    @JvmStatic
     fun convertAll(target: Any): Array<Type>? {
         var result: Array<Type>? = null
         val cls = target.javaClass
@@ -31,6 +33,7 @@ object TypeConvert {
         return result
     }
 
+    @JvmStatic
     private fun convertType(type: Type): Array<Type>? {
         var result: Array<Type>? = null
         if (type is ParameterizedType) {

@@ -10,12 +10,16 @@ import java.security.MessageDigest
 
 
 object MD5 {
+    @JvmStatic
     private val hexDigits = charArrayOf('0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f')
 
+    @JvmStatic
     fun _md5(bytes: ByteArray): ByteArray = MessageDigest.getInstance("MD5").digest(bytes)
 
+    @JvmStatic
     fun md5(str: String): String = md5(str.toByteArray())
 
+    @JvmStatic
     fun md5(bytes: ByteArray): String {
         var result = ""
         try {

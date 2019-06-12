@@ -1,102 +1,113 @@
-# Connector 观察者根据类型进行精准通知
-    1.观察者模式根据泛型nofity同一类型observer，支持绑定activity自动回收
-    
-    2.线程组执行回调（子线程中运行）
-    
-    3.支持内存，文件缓存，支持缓存时间设置
-    
-    4.提供了动态代理默认方法
+# Assignor 数据流架构(委托者)
+
+BodyModel,BodyData提供数据流操作，支持缓存，支持自动释放资源，只有UI可见才更新
+
+BodyData数据调度隶属于BodyModel,每个Activity最多有一个同名BodyModel
+
+IAsyncWork提供异步线程任务，且支持数量设置和结果回调
+
+ISyncWork提供同步线程组任务，且支持数量设置和结果回调
+
+Worker.mainCall{} 主线程运行（内部异常处理）
+
+Worker.ioExecute{} 子线程运行（内部异常处理）
     
 # Use
-    compile 'com.uis:lib-connector:1.1.0'
+    compile 'com.uis:assignor:0.0.1-CR1'
+    
+### Model Data用法
 
-#### 精准观察者（支持内存和文件缓存）
-    ConnObserverOwner owner = new ConnObserverOwner();
+```
+    //在Application先调用，初始化生命周期监听（线程安全）
+    Assignor.init(application)
     
-    //绑定activity生命周期，自动反注册
-    owner.attachActivity(activity);
+    class DemoModel :BodyModel() {
+        val stringBody = BodyData<String>()
+        val intBody = BodyData<Int>()
+    }
     
-    //注册监听器,当 cacheKey或者范性类型 匹配时回调（cacheKey优先级高于类型匹配）
-    //new SimpleObserver<ArrayList<String>>()直接监听对象含有范型不支持，可以把范型放入到新类中
-    owner.registerObserver(new SimpleObserver<String>() {
-        public String getCacheKey() {
-            return "actionb";
-        }
-        
-        @Override
-        public void onResponse(Response<String> resp) {
-            
-        }
-        
-        @Override
-        public void onCacheResponse(Response<TestA> resp) {
-                
-        }
-    });
+    //创建Model,重复调用该方法会使用缓存，每个Activity只有一个同名Model
+    //Assignor.of()获取到一个BodyStore,接着通过无参构造函数获取DemoModel
+    //DemoModel创建后会自动查找BodyData相关变量，把生命周期关联到BodyData（无须手动关联）
+    //Activity生命周期传递:Assignor->BodyStor->DemoModel->BodyData
+    //Assignor.of(activity)此处使用的activit.hashCode(),不会内存泄露
+    val model = Assignor.of(this).get(DemoModel::class.java)
     
-    //匹配缓存，回调接听器中的onCacheResponse方法
-    owner.notifyCache("actionb",15000);//结果不为null,回调onCacheResponse生效
+    //监听数据，只有当Activity在OnResumed后OnPaused前会回调
+    //如果不在该范围，下次重新进入范围继续回调
+    model.stringBody.addObserver{data->
+        ALog.e("string data= $data")
+    }
     
-    //发送结果，回调接听器中的onResponse方法
-    Response resp = Response.newBuilder("success")
-          .setCacheKey("actionb")//to support cache,setCache()回调onCacheResponse生效
-          .build();
-    owner.notifyResponse(resp);
+    //子线程设置value和直接设置value（最后都在主线程回调）
+    Worker.ioExecute {
+        model.stringBody.setValue("action clicked test1")
+    }
+    model.stringBody.setValue("action clicked test1")
+    
+    //获取最新缓存（没有值为NULL）
+    ALog.e("cache value: "+test.stringBody.getValue())
+```
 
-#### 线程组调用（回调线程安全）
-        MultithOwner multithOwner = new MultithOwner(3,new MultithCallback() {//指定线程数量
-            @Override
-            public void onMultith(MultithResponse response) {//全部执行完回调
-                Clog.print(response.result.toString());
-            }
+#### 线程组
+```
+//同步线程组,lambda写法
+    fun syncCall(){
+        Worker.syncWork().sync {
+                    ALog.e(it.toString())
+                    "s1"
+                }
+                .sync {
+                    ALog.e(it.toString())
+                    "s2"
+                }
+                .sync {
+                    ALog.e(it.toString())
+                    "s3"
+                }
+                .sync {
+                    ALog.e(it.toString())
+                    "s4"
+                }
+                .done {
+                    ALog.e("done:"+it.toString())
+                }
+    }
+    
+//异步线程组，lambda写法
+    fun asyncCall(){
+        Worker.asyncWork().async {
+                    ALog.e("async 1")
+                    return@async AsyncResult("001","1")
+                }
+                .async {
+                    ALog.e("async 2")
+                    return@async AsyncResult("002","2")
+                }
+                .async {
+                    ALog.e("async 3")
+                    return@async AsyncResult("003","3")
+                }
+                .async {
+                    ALog.e("async 4")
+                    return@async AsyncResult("004","4")
+                }.done {
+                    ALog.e("done:"+it.toString())
+                }
+    }    
+```
 
-            @Override
-            public void onProgress(int position, String key, Object value) {//执行进度
-                Clog.print("position="+position+",key="+key+",value="+value);
-            }
-        });
-        ConnPlant.submit(new Runnable() {
-            @Override
-            public void run() {
-                multithOwner.setResult("k100","value100");//发送单个线程执行完结果
-            }
-        },new Runnable() {
-            @Override
-            public void run() {
-                SystemClock.sleep(1000);
-                multithOwner.setResult("k200","value200");
-            }
-        },new Runnable() {
-            @Override
-            public void run() {
-                SystemClock.sleep(2000);
-                multithOwner.setResult("k300","value300");
-            }
-        });
+
+
 
 # Version
+Version|Descipt|Fixed|Time
+----|----|----|----
+0.0.1-CR1|预览版本| |2019/06
 
-    v1.0.0 优化资源回收，多线程回调优化
-    v0.0.5 解决application反射出null的bug，file缓存采用FileChannel mapBuffer读写加速
-    
-    v0.1.2 优化缓存方式,增加缓存分类prefix，增加Response建造者模式
-                file缓存采用读写锁，废除FileChannel方式
-    
-    v0.1.3 缓存目录优化，缓存支持内存清除和null设置，activity支持绑定多个ConnObserverOWner
-    
-    v0.2.0 文件缓存废除序列化，自动将对象转json，取缓存的结果也为json
-                registerObserver时根据getCacheKey()读取缓存并回调
-                设置cacheKey后：结果回调只匹配key
-                不设置cacheKey：只匹配Type
-    v0.3.0 fixed Gson格式html字符解析异常，attachFragment在ViewPager异常,Kotlin中范型Type匹配失败
-    v0.5.0 fixed String存储Gson读取出现Html格式问题，保存的Entity混淆需要keep fields
-    v1.0.0 环境升级，内存回收优化
-    v1.1.0 回调方法区分缓存，解决4.4系统Gson().newBuilder()异常问题，结果为null不回调;
-        废除Response.Builder setParadigm(Type type)等方法;
-        动态代理ProxyInvocationHandler增加beforeInvoke和afterInvoke方法
 
 # License
-           Copyright [2018] uis
+           Copyright [2019] uis
         
            Licensed under the Apache License, Version 2.0 (the "License");
            you may not use this file except in compliance with the License.

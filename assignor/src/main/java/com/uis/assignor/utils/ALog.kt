@@ -10,18 +10,24 @@ import android.util.Log
 
 object ALog {
 
+    @JvmStatic
     private var debug = false
+    private var priority = Log.DEBUG
 
-    fun enableLog() {
-        debug = true
+    @JvmStatic
+    fun enableLog(priority: Int = Log.DEBUG) {
+        this.priority = priority
+        this.debug = true
     }
 
+    @JvmStatic
     fun printStackTrace(ex: Throwable) {
         if (debug) {
             ex.printStackTrace()
         }
     }
 
+    @JvmStatic
     fun printStack(msg: String) {
         if (!debug) {
             return
@@ -38,28 +44,10 @@ object ALog {
                     .append(element.methodName).append("()\n")
             i++
         }
-        print(builder.append(msg).toString())
+        this.print(Log.ERROR,builder.append(msg).toString())
     }
 
-    fun print(msg: String) {
-        if (!debug) {
-            return
-        }
-        val size = msg.length
-        val length = 2048
-        if (size <= length) {
-            Log.e("ALog", msg)
-        } else {
-            var i = 0
-            var start = i
-            while (i < size) {
-                i = if (i + length < size) i + length else size
-                Log.e("ALog", msg.substring(start, i))
-                start = i
-            }
-        }
-    }
-
+    @JvmStatic
     fun printStack() {
         if (!debug) {
             return
@@ -70,6 +58,51 @@ object ALog {
                     .append(element.lineNumber).append(")")
                     .append(element.methodName).append("()\n")
         }
-        print(builder.toString())
+        this.print(Log.ERROR,builder.toString())
+    }
+
+    @JvmStatic
+    fun v(msg :String){
+        print(Log.VERBOSE,msg)
+    }
+
+    @JvmStatic
+    fun d(msg :String){
+        print(Log.DEBUG,msg)
+    }
+
+    @JvmStatic
+    fun i(msg :String){
+        print(Log.INFO,msg)
+    }
+
+    @JvmStatic
+    fun w(msg :String){
+        print(Log.WARN,msg)
+    }
+
+    @JvmStatic
+    fun e(msg :String){
+        print(Log.ERROR,msg)
+    }
+
+    @JvmStatic
+    fun print(priority :Int,msg: String) {
+        if (!debug || this.priority > priority) {
+            return
+        }
+        val size = msg.length
+        val length = 2048
+        if (size <= length) {
+            Log.println(priority,"ALog", msg)
+        } else {
+            var i = 0
+            var start = i
+            while (i < size) {
+                i = if (i + length < size) i + length else size
+                Log.println(priority,"ALog", msg.substring(start, i))
+                start = i
+            }
+        }
     }
 }
