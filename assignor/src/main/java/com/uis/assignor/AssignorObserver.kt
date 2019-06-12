@@ -1,4 +1,5 @@
 package com.uis.assignor
 
-interface AssignorObserver {
+interface AssignorObserver<T> {
+    fun onDataChanged(data :T)
 }

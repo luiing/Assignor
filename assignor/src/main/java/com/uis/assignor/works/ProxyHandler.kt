@@ -14,6 +14,7 @@ import java.lang.reflect.Proxy
  * 动态代理InvocationHandler
  * @author uis 2019/5/10
  */
+@Suppress("unchecked_cast")
 class ProxyHandler<T :Any>(protected var target: T) : InvocationHandler {
 
     private val mclassLoader: ClassLoader? get() = target::class.java.classLoader

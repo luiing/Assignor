@@ -36,11 +36,10 @@ class SyncWorkImpl :ISyncWork{
                 atomic.set(deque.size)
             }
             while (atomic.get() > 0) {
-                deque.poll()?.let {
-                    val old = value
-                    value = it(old)
+                deque.poll()?.apply {
+                    value = this(value)
                     atomic.decrementAndGet()
-                    return@let
+                    return@apply
                 }
             }
             work(value)
