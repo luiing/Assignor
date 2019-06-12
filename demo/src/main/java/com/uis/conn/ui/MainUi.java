@@ -7,14 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
-import com.uis.assignor.utils.ALog;
-import com.uis.assignor.utils.TypeConvert;
-import com.uis.assignor.utils.TypeParam;
 import com.uis.connector.demo.R;
-
-import java.lang.reflect.TypeVariable;
-import java.util.ArrayList;
-import java.util.List;
 
 
 public class MainUi extends AppCompatActivity implements View.OnClickListener {
@@ -49,9 +42,6 @@ public class MainUi extends AppCompatActivity implements View.OnClickListener {
     public void onClick(View v) {
         int id = v.getId();
         if(R.id.bt_action_a == id){
-            ALog.e(new TypeParam<ArrayList<String>>(){}.getType().toString());
-            List<String> list = new ArrayList<>();
-            ALog.e(list.getClass().getName());
             Intent it = new Intent(this,DemoUi.class);
             startActivity(it);
         }else if(R.id.bt_action_b == id){
@@ -74,7 +64,6 @@ public class MainUi extends AppCompatActivity implements View.OnClickListener {
     @Override
     protected void onResume() {
         super.onResume();
-        ALog.e("hashcode="+hashCode());
     }
 
     @Override

@@ -7,8 +7,8 @@
 package com.uis.conn.ui
 
 import com.uis.assignor.AssignorOwner
-import com.uis.assignor.Body
-import com.uis.assignor.BodyObserver
+import com.uis.assignor.AssignorBody
+import com.uis.assignor.AssignorObserver
 import com.uis.assignor.utils.ALog
 
 /**
@@ -17,27 +17,27 @@ import com.uis.assignor.utils.ALog
  * @github https://github.com/luiing
  */
 class DemoOwner :AssignorOwner() {
-    val stringBody = Body<String>()
+    val stringBody = AssignorBody<String>()
 
-    val intBody = Body<Int>()
+    val intBody = AssignorBody<Int>()
 
-    val listBody = Body<ArrayList<String>>()
+    val listBody = AssignorBody<ArrayList<String>>()
 
     init {
-        stringBody.addObserver(this,observer = object :BodyObserver<String>{
-            override fun onBodyChanged(data: String) {
+        stringBody.addObserver(this,observer = object :AssignorObserver<String>{
+            override fun onDataChanged(data: String) {
                 ALog.e("data= $data")
             }
         })
 
-        intBody.addObserver(this,observer = object :BodyObserver<Int>{
-            override fun onBodyChanged(data: Int) {
+        intBody.addObserver(this,observer = object :AssignorObserver<Int>{
+            override fun onDataChanged(data: Int) {
                 ALog.e("data= $data")
             }
         })
 
-        listBody.addObserver(this,observer = object :BodyObserver<ArrayList<String>>{
-            override fun onBodyChanged(data: ArrayList<String>) {
+        listBody.addObserver(this,observer = object :AssignorObserver<ArrayList<String>>{
+            override fun onDataChanged(data: ArrayList<String>) {
                 ALog.e("data= ${data.toString()}")
             }
         })

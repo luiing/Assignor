@@ -18,8 +18,10 @@ const val NO_PREFIX = ""
 const val MAX_CACHE_SIZE = 200
 
 const val State_Destroy = 1
-const val State_Created = 2
-const val State_Resumed = 3
+const val State_SaveInstance = 2
+const val State_Paused = 3
+const val State_Created = 4
+const val State_Resumed = 5
 
 
 data class CacheEntity(val arg:Any?, var mills:Long = System.currentTimeMillis()) {

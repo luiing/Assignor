@@ -7,24 +7,28 @@
 package com.uis.assignor
 
 import android.support.v4.util.ArrayMap
+import com.uis.assignor.utils.ALog
 
-class AssignorAgent{
-    private var bodyMap:ArrayMap<String,AssignorOwner> = ArrayMap()
+class AssignorAgent :AssignorState{
+    private var owners:ArrayMap<String,AssignorOwner> = ArrayMap()
 
-    fun onStateChange(state :Int){
-        for(item in bodyMap.values){
-            item.onStateChange(state)
+    override fun onStateChanged(state: Int) {
+        for(item in owners.values){
+            item.onStateChanged(state)
         }
         if(State_Destroy == state){
-            bodyMap.clear()
+            owners.clear()
         }
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T:AssignorOwner> get(cls :Class<T>) :T {
-        val key = "com.uis.assignor.AssignorOwner.default:".plus(cls.name)
-        return bodyMap[key]?.let { it as T } ?: {
-            Assignor.createOwner(cls)
+    fun <T :AssignorOwner> get(cls :Class<T>) :T {
+        val key = "com.uis.assignor.AssignorOwner.default:".plus(cls.name).plus(cls.canonicalName)
+        val owner = owners[key] ?: {
+                val it = Assignor.createOwner(cls)
+                owners.put(key, it)
+                it
         }()
+        return  owner as T
     }
 }

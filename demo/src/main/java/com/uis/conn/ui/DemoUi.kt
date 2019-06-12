@@ -7,6 +7,7 @@
 package com.uis.conn.ui
 
 import android.app.Activity
+import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
 import com.uis.assignor.utils.ALog
@@ -27,13 +28,21 @@ class DemoUi :Activity() {
 
     val agent = DemoAgent()
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
         agent.attach(this)
+        agent.string("init created...")
+        super.onCreate(savedInstanceState)
         setContentView(R.layout.ui_main)
         bt_action_a.setOnClickListener{
             //syncCall()
             agent.int()
+            Worker.ioExecute {
+                SystemClock.sleep(5000)
+                agent.string("sleep 5000")
+            }
+            val it = Intent(this, DemoUi::class.java)
+            startActivity(it)
         }
         bt_action_b.setOnClickListener {
             //asyncCall()
@@ -43,17 +52,6 @@ class DemoUi :Activity() {
             //both()
             agent.list()
         }
-        agent.string("created...")
-    }
-
-    override fun onResume() {
-        super.onResume()
-        //agent.string("onResume")
-    }
-
-    override fun onPause() {
-        super.onPause()
-        agent.string("onPause")
     }
 
     fun asyncCall(){

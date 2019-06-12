@@ -31,30 +31,32 @@ object Assignor {
                 if (app == null) {
                     app = application
                     application.registerActivityLifecycleCallbacks(object : ActLifecycle() {
-                        override fun onActivityCreated(activity: Activity, savedInstanceState: Bundle) {
-                            _init(activity.hashCode())
+                        override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {
+                            activity?.hashCode()?.apply {
+                                _stateChange(this, State_Created)
+                            }
                         }
 
-                        override fun onActivityResumed(activity: Activity) {
-                            activity.hashCode().apply {
+                        override fun onActivityResumed(activity: Activity?) {
+                            activity?.hashCode()?.apply {
                                 _stateChange(this, State_Resumed)
                             }
                         }
 
-                        override fun onActivityPaused(activity: Activity) {
-                            activity.hashCode().apply {
-                                _stateChange(this, State_Created)
+                        override fun onActivityPaused(activity: Activity?) {
+                            activity?.hashCode()?.apply {
+                                _stateChange(this, State_Paused)
                             }
                         }
 
-                        override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
-                            activity.hashCode().apply {
-                                _stateChange(this, State_Created)
+                        override fun onActivitySaveInstanceState(activity: Activity?, outState: Bundle?) {
+                            activity?.hashCode()?.apply {
+                                _stateChange(this, State_SaveInstance)
                             }
                         }
 
-                        override fun onActivityDestroyed(activity: Activity) {
-                            activity.hashCode().apply {
+                        override fun onActivityDestroyed(activity: Activity?) {
+                            activity?.hashCode()?.apply {
                                 _stateChange(this, State_Destroy)
                             }
                         }
@@ -65,14 +67,15 @@ object Assignor {
     }
 
     private fun _stateChange(code: Int, state: Int) {
-        observables[code]?.observable?.onStateChange(state)
-        if (State_Destroy == state) {
-            observables.remove(code)
+        observables[code]?.observable?.apply {
+            onStateChanged(state)
+            if (State_Destroy == state) {
+                observables.remove(code)
+            }
         }
     }
 
     private fun _init(code: Int): AssignorAgent{
-        ALog.e("_init $code")
         return observables[code]?.observable ?:  {obs: AssignorAgent->
             observables[code] =  StateObservable(code, obs)
             obs
@@ -87,8 +90,11 @@ object Assignor {
         return _init(activity.hashCode())
     }
 
+    /**
+     * @param code see [Activity.hashCode]
+     */
     @JvmStatic
-    fun observable(code:Int):AssignorAgent?{
+    fun agent(code:Int):AssignorAgent?{
         return observables[code]?.observable
     }
 
