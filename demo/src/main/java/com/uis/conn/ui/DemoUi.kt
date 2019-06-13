@@ -10,48 +10,49 @@ import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
 import android.os.SystemClock
+import android.view.View
 import com.uis.assignor.Assignor
 import com.uis.assignor.utils.ALog
 import com.uis.assignor.works.AsyncResult
 import com.uis.assignor.works.Worker
+import com.uis.conn.view.TestA
 import com.uis.connector.demo.R
 import kotlinx.android.synthetic.main.ui_main.*
+import kotlin.jvm.functions.FunctionN
 
 /**
  * @autho uis
  * @date 2019-06-06
  * @github https://github.com/luiing
  */
-class DemoUi :Activity() {
+class DemoUi :Activity(){
     val model = Assignor.of(this).get(DemoModel::class.java)
     val test = Assignor.of(this).get(TestModel::class.java)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.ui_main)
 
-        test.stringBody.setValue("onCreated....")
-        test.stringBody.addObserver {data->
+        test.stringBody.observer {data->
             ALog.e("string data= $data")
         }
 
-        model.intBody.addObserver{data->
+        model.intBody.observer{data->
             ALog.e("int data= $data")
         }
 
-        model.demoBody.addObserver { data->
+        model.demoBody.observer { data->
             ALog.e("demo body data = $data")
         }
 
-        model.intBody.addObserver{data->
+        model.intBody.observer{data->
             ALog.e("int data2= $data")
         }
 
-        model.stringBody.addObserver{data->
+        model.stringBody.observer{data->
             ALog.e("string data= $data")
         }
-        model.listBody.addObserver{data->
+        model.listBody.observer{data->
             ALog.e("list data= ${data.toString()}")
         }
 
@@ -75,24 +76,21 @@ class DemoUi :Activity() {
             list.add("001")
             list.add("002")
             model.listBody.setValue(list)
-
-            ALog.e("cache value: "+test.stringBody.getValue()?.toString())
-        }
-        Worker.ioExecute {
-            SystemClock.sleep(3000)
-            test.stringBody.setValue("ioExecute")
+            ALog.e("cache value: "+test.stringBody.getValue())
+            cacheTest()
         }
     }
 
-    override fun onResume() {
-        ALog.e("onResume")
-        super.onResume()
-
-    }
-
-    override fun onDestroy() {
-        test.stringBody.setValue("test onDestroy")
-        super.onDestroy()
+    fun cacheTest(){
+        val name = "cacheTest"
+        val value = TestA("liy",22,"shanghai")
+        val cache = Assignor.cache()
+        cache.writeCache(name,value,true)
+        ALog.e("read cache1: " + cache.readCache(name))
+        cache.removeCache(name)
+        ALog.e("read cache2: " + cache.readCache(name = name,isDisk = true))
+        cache.removeCache(name,true)
+        ALog.e("read cache3: " + cache.readCache(name = name,isDisk = true))
     }
 
     fun asyncCall(){
@@ -138,9 +136,5 @@ class DemoUi :Activity() {
                 .done {
                     ALog.e("done:"+it.toString())
                 }
-    }
-
-    fun both(){
-
     }
 }
