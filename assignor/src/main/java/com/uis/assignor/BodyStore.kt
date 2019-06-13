@@ -23,10 +23,10 @@ class BodyStore :IState{
 
     @Suppress("UNCHECKED_CAST")
     fun <T :BodyModel> get(cls :Class<T>) :T {
-        val key = "com.uis.assignor.AssignorOwner.default:".plus(cls.name).plus(cls.canonicalName)
+        val key = "com.uis.assignor.BodyModel.default:".plus(cls.name).plus(cls.canonicalName)
         val owner = models[key] ?: {
             val it = Assignor.createModel(cls)
-            it._autoFindBodyModel()
+            it.autoFindBodyModel()
             models.put(key, it)
             it
         }()

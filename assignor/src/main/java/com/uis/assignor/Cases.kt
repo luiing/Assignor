@@ -23,9 +23,7 @@ const val State_Paused = 3
 const val State_Created = 4
 const val State_Resumed = 5
 
-
 data class CacheEntity(val arg:Any?, var mills:Long = System.currentTimeMillis()) {
-
     var data:String? = null
     init {
         if(arg is String){

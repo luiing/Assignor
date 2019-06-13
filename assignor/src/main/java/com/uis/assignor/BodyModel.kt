@@ -15,14 +15,14 @@ import java.util.*
  * @github https://github.com/luiing
  * 自动生成[BodyModel]使用的是无参构造函数
  */
-abstract class BodyModel :IState{
+open class BodyModel :IState{
     private val states = LinkedList<IState>()
     private var destroyCall :(()->Unit)? = null
 
     /** 自动注册 [BodyData] [IState] */
-    internal fun _autoFindBodyModel(cls :Class<*>? =javaClass){
+    internal fun autoFindBodyModel(cls :Class<*>? =javaClass){
         cls?.let {
-            for( field in cls.declaredFields){
+            for( field in it.declaredFields){
                 //ALog.e("field name ${field.name},${field.type},"+(field.type == BodyData::class.java))
                 if(isBodyData(field.type)){
                     field.isAccessible = true
@@ -33,20 +33,20 @@ abstract class BodyModel :IState{
                     }
                 }
             }
-            _autoFindBodyModel(it.superclass)
+            autoFindBodyModel(it.superclass)
         }
     }
 
     internal fun isBodyData(cls :Class<*>) :Boolean{
         var type :Class<*>? = cls
-        do{
+        while(true){
             if(type == BodyData::class.java){
                 return true
             }
             type?.superclass?.let {
                 type = it
             } ?: return false
-        }while(true)
+        }
     }
 
     override fun onStateChanged(state: Int) {
