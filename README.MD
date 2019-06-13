@@ -8,10 +8,10 @@ IAsyncWork提供异步线程任务，且支持数量设置和结果回调
 
 ISyncWork提供同步线程组任务，且支持数量设置和结果回调
 
-Worker.mainCall{} 主线程运行（内部异常处理）
+Worker.mainExecute{} 主线程运行（内部异常处理）
 
 Worker.ioExecute{} 子线程运行（内部异常处理）
-    
+
 # Use
     compile 'com.uis:assignor:0.0.1-CR1'
     

@@ -10,7 +10,10 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import android.support.v4.util.ArrayMap
+import com.uis.assignor.cache.CacheImpl
+import com.uis.assignor.cache.ICache
 import com.uis.assignor.utils.ALog
+import java.io.File
 
 /**
  * @autho uis
@@ -20,9 +23,10 @@ import com.uis.assignor.utils.ALog
 
 object Assignor {
 
-    private data class StateObservable(var code: Int, var store: BodyStore?)
-    private var app: Application? = null
-    private var observables = ArrayMap<Int, StateObservable>()
+    private data class StateBodyStore(var code: Int, var store: BodyStore?)
+    @JvmStatic private var app: Application? = null
+    @JvmStatic private val cache :ICache by lazy { CacheImpl(File(app!!.filesDir,".assignor")) }
+    @JvmStatic private var observables = ArrayMap<Int, StateBodyStore>()
 
     @JvmStatic
     fun init(application: Application) {
@@ -77,7 +81,7 @@ object Assignor {
 
     internal fun init(code: Int): BodyStore{
         return observables[code]?.store ?:  {store: BodyStore->
-            observables[code] =  StateObservable(code, store)
+            observables[code] =  StateBodyStore(code, store)
             store
         }(BodyStore())
     }
@@ -86,7 +90,6 @@ object Assignor {
     fun of(activity: Activity): BodyStore {
         activity.application?.apply {
             init(this)
-            ALog.e("Assignor init")
         }
         return init(activity.hashCode())
     }
@@ -103,4 +106,10 @@ object Assignor {
     fun<T:BodyModel> createModel(cls :Class<T>) :T{
         return cls.newInstance()
     }
+
+    @JvmStatic
+    fun cache(parent : File): ICache = CacheImpl(parent)
+
+    @JvmStatic
+    fun cache(): ICache = cache
 }

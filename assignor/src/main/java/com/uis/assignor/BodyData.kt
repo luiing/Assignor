@@ -7,6 +7,7 @@ import com.uis.assignor.works.Worker
 open class BodyData<T :Any> :IState{
     companion object{
         @JvmStatic private val VERSION_NONE = -1
+        @JvmStatic private val VALUE_NONE = Any()
     }
 
     private data class ItemObserver<I>(var version:Int= VERSION_NONE,var observer: (I)->Unit)
@@ -14,19 +15,20 @@ open class BodyData<T :Any> :IState{
     private val postLock = Any()
     private val observers = ArrayMap<((T)->Unit),ItemObserver<T>>()
     @Volatile private var mState = State_Created
-    @Volatile private var postValue :Any? = null
-    @Volatile private var mValue :Any? = postValue
+    @Volatile private var postValue :Any = VALUE_NONE
+    @Volatile private var mValue :Any = VALUE_NONE
     @Volatile private var mVersion = VERSION_NONE
     
     @Suppress("UNCHECKED_CAST")
     private val postCall :()->Unit = {
+        val v :Any
         synchronized(postLock){
-            val v = postValue
-            postValue = null
-            (v as? T)?.apply {
-                setValue(this)
-            }
+             v = postValue
+            postValue = VALUE_NONE
             return@synchronized
+        }
+        (v as? T)?.apply {
+            setValue(v)
         }
     }
 
@@ -47,7 +49,10 @@ open class BodyData<T :Any> :IState{
      */
     @Suppress("unchecked_cast")
     fun getValue() :T?{
-        return mValue as? T
+        if(mValue != VALUE_NONE){
+            return mValue as T
+        }
+        return null
     }
 
     fun setValue(v :T){
@@ -58,21 +63,17 @@ open class BodyData<T :Any> :IState{
                 notifyDataChanged()
             }.exceptionOrNull()?.printStackTrace()
         }else{
-            val canPost:Boolean
             synchronized(postLock){
-                canPost = postValue == null
                 postValue = v
             }
-            if(canPost) {
-                Worker.mainExecute(postCall)
-            }
+            Worker.mainExecute(postCall)
         }
     }
 
     @Suppress("UNCHECKED_CAST")
     internal fun notifyDataChanged(){
         if(State_Resumed == this.mState){
-            mValue?.apply {
+            mValue.apply {
                 for (item in observers.values) {
                     if (item.version < mVersion && State_Resumed == mState) {
                         item.version = mVersion
@@ -83,13 +84,17 @@ open class BodyData<T :Any> :IState{
         }
     }
 
-    fun addObserver(observer: (T)->Unit){
+    fun observer(observer: (T)->Unit){
         if(!observers.containsKey(observer)){
             observers[observer] = ItemObserver(observer = observer)
         }
     }
 
-    internal fun removeObservers(){
+    fun removeObserver(observer: (T)->Unit){
+        observers.remove(observer)
+    }
+
+    fun removeObservers(){
         observers.clear()
     }
 }
