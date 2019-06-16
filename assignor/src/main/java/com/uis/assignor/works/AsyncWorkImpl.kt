@@ -5,6 +5,7 @@
  */
 
 package com.uis.assignor.works
+import com.uis.assignor.AsyncResult
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.LinkedBlockingDeque
 import java.util.concurrent.atomic.AtomicInteger
@@ -16,7 +17,7 @@ import java.util.concurrent.atomic.AtomicInteger
  */
 class AsyncWorkImpl :IAsyncWork{
 
-    private val deque = LinkedBlockingDeque<()->AsyncResult>()
+    private val deque = LinkedBlockingDeque<()-> AsyncResult>()
 
     private val atomic = AtomicInteger(-1)
 

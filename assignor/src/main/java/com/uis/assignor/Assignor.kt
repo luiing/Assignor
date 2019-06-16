@@ -10,7 +10,10 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import android.support.v4.util.ArrayMap
+import com.uis.assignor.cache.CacheImpl
+import com.uis.assignor.cache.ICache
 import com.uis.assignor.utils.ALog
+import java.io.File
 
 /**
  * @autho uis
@@ -20,9 +23,9 @@ import com.uis.assignor.utils.ALog
 
 object Assignor {
 
-    private data class StateObservable(var code: Int, var store: BodyStore?)
-    private var app: Application? = null
-    private var observables = ArrayMap<Int, StateObservable>()
+    @JvmStatic private var app: Application? = null
+    @JvmStatic private val cache :ICache by lazy { CacheImpl(File(app!!.filesDir,".assignor")) }
+    @JvmStatic private var observables = ArrayMap<Int, BodyStore>()
 
     @JvmStatic
     fun init(application: Application) {
@@ -67,17 +70,18 @@ object Assignor {
     }
 
     internal fun stateChange(code: Int, state: Int) {
-        observables[code]?.store?.apply {
+        observables[code]?.apply {
             onStateChanged(state)
             if (State_Destroy == state) {
                 observables.remove(code)
             }
         }
+        //ALog.e("BodyStore size is ${observables.size}")
     }
 
     internal fun init(code: Int): BodyStore{
-        return observables[code]?.store ?:  {store: BodyStore->
-            observables[code] =  StateObservable(code, store)
+        return observables[code] ?:  {store: BodyStore->
+            observables[code] =  store
             store
         }(BodyStore())
     }
@@ -86,7 +90,6 @@ object Assignor {
     fun of(activity: Activity): BodyStore {
         activity.application?.apply {
             init(this)
-            ALog.e("Assignor init")
         }
         return init(activity.hashCode())
     }
@@ -95,12 +98,18 @@ object Assignor {
      * @param code see [Activity.hashCode]
      */
     @JvmStatic
-    fun of(code:Int):BodyStore?{
-        return observables[code]?.store
+    fun of(code:Int):BodyStore{
+        return init(code)
     }
 
     @JvmStatic
     fun<T:BodyModel> createModel(cls :Class<T>) :T{
         return cls.newInstance()
     }
+
+    @JvmStatic
+    fun cache(parent : File): ICache = CacheImpl(parent)
+
+    @JvmStatic
+    fun cache(): ICache = cache
 }

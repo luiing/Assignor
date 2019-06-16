@@ -7,65 +7,77 @@
 package com.uis.assignor.cache
 
 import android.support.v4.util.LruCache
+import com.google.gson.Gson
 import com.uis.assignor.CacheEntity
-import com.uis.assignor.MAX_CACHE_SIZE
+import com.uis.assignor.DEFAULT_CACHE_SIZE
+import com.uis.assignor.NO_TIME_OUT
+import com.uis.assignor.utils.ALog
+import com.uis.assignor.utils.FileUtils
 import com.uis.assignor.utils.MD5
 import java.io.File
-import java.util.concurrent.locks.ReadWriteLock
-import java.util.concurrent.locks.ReentrantReadWriteLock
 
-class CacheImpl(private var parent:File?, private var maxSize :Int= MAX_CACHE_SIZE):Cache {
+class CacheImpl(private var parent:File, private var maxSize :Int= DEFAULT_CACHE_SIZE):ICache {
 
-    private val locks: LruCache<String, ReadWriteLock>
-    private val lruCache: LruCache<String, CacheEntity>
+    class BodyLruCache(maxSize: Int) : LruCache<String, CacheEntity>(maxSize) {
+        override fun sizeOf(key: String, value: CacheEntity): Int {
+            return value.size()
+        }
+    }
+
+    private val dataCache: LruCache<String, CacheEntity> = BodyLruCache(maxSize)
 
     init {
-        if(maxSize < 0){
-            maxSize = MAX_CACHE_SIZE
+        if(maxSize <= 0){
+            maxSize = DEFAULT_CACHE_SIZE
         }
+        if (!parent.exists()) {
+            parent.mkdirs()
+        }
+    }
 
-        parent?.let {
-            if (!it.exists()) {
-                it.mkdirs()
+    override fun readCache(name: String, mills: Long, isDisk: Boolean): String {
+        var entity:CacheEntity? = dataCache.get(name)
+        if(entity == null && isDisk) {
+            FileUtils.readFileInput(createFile(name))?.let {
+                Gson().fromJson(String(it), CacheEntity::class.java)?.let {
+                    entity = it
+                    dataCache.put(name,it)
+                }
             }
         }
-        lruCache = CacheImpl.InnerCache(maxSize)
-        locks = LruCache(20)
-    }
-
-    class InnerCache(maxSize: Int) : LruCache<String, CacheEntity>(maxSize) {
-        override fun entryRemoved(evicted: Boolean, key: String, oldValue: CacheEntity, newValue: CacheEntity?) {
-            if (evicted) {
-                oldValue.data = null
+        entity?.let {
+            if (mills == NO_TIME_OUT || (System.currentTimeMillis() - it.mills) < mills) {
+                return it.data
             }
         }
+        return ""
+    }
 
-        override fun sizeOf(key: String, value: CacheEntity): Int {
-            return 1
+    override fun writeCache(name: String,value: Any, isDisk: Boolean) {
+        val entity = CacheEntity(value)
+        dataCache.put( name,entity)
+        if(isDisk){
+            val data = Gson().newBuilder().disableHtmlEscaping().create().toJson(entity)
+            FileUtils.writeFileOutput(createFile(name),data.toByteArray())
         }
     }
 
-    override fun readCache() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    override fun writeCache() {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
-    }
-
-    private fun getLock(key: String): ReadWriteLock {
-        var lock = locks.get(key)
-        if(lock == null){
-            lock = ReentrantReadWriteLock()
-            locks.put(key, lock)
+    override fun removeCache(name: String, isDisk: Boolean) {
+        dataCache.remove(name)
+        if(isDisk){
+            createFile(name).delete()
         }
-        return lock
     }
 
-    private fun getOrCreatePath(key :String):File{
+    override fun removeAllCache() {
+        dataCache.evictAll()
+        FileUtils.removeFileDirectory(parent)
+    }
+
+    internal fun createFile(key :String):File{
         val name = MD5.md5(key)
         val builder = StringBuilder()
-        for (index in 0..2) {
+        for (index in 0 until 5) {
             val dir = name.substring(2 * index, 2 * (index + 1))
             builder.append(dir).append(File.separatorChar)
         }
@@ -73,6 +85,6 @@ class CacheImpl(private var parent:File?, private var maxSize :Int= MAX_CACHE_SI
         if(!path.exists()){
             path.mkdirs()
         }
-        return path
+        return File(path,name)
     }
 }

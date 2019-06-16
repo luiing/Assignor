@@ -62,7 +62,7 @@ open class BodyModel :IState{
         }
     }
 
-    fun onDestroy(call :()->Unit){
+    fun destroy(call :()->Unit){
         destroyCall = call
     }
 
