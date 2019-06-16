@@ -27,7 +27,7 @@ class CacheImpl(private var parent:File, private var maxSize :Int= DEFAULT_CACHE
     private val dataCache: LruCache<String, CacheEntity> = BodyLruCache(maxSize)
 
     init {
-        if(maxSize < 0){
+        if(maxSize <= 0){
             maxSize = DEFAULT_CACHE_SIZE
         }
         if (!parent.exists()) {
@@ -36,16 +36,21 @@ class CacheImpl(private var parent:File, private var maxSize :Int= DEFAULT_CACHE
     }
 
     override fun readCache(name: String, mills: Long, isDisk: Boolean): String {
-        val entity:CacheEntity = dataCache.get(name) ?: {
+        var entity:CacheEntity? = dataCache.get(name)
+        if(entity == null && isDisk) {
             FileUtils.readFileInput(createFile(name))?.let {
-                dataCache.put(name,Gson().fromJson(String(it),CacheEntity::class.java))
-                return@let dataCache.get(name)
-            } ?: CacheEntity("",-1)
-        }()
-        if(mills == NO_TIME_OUT || (System.currentTimeMillis() - entity.mills) < mills)
-            return entity.data
-        else
-            return ""
+                Gson().fromJson(String(it), CacheEntity::class.java)?.let {
+                    entity = it
+                    dataCache.put(name,it)
+                }
+            }
+        }
+        entity?.let {
+            if (mills == NO_TIME_OUT || (System.currentTimeMillis() - it.mills) < mills) {
+                return it.data
+            }
+        }
+        return ""
     }
 
     override fun writeCache(name: String,value: Any, isDisk: Boolean) {
@@ -80,7 +85,6 @@ class CacheImpl(private var parent:File, private var maxSize :Int= DEFAULT_CACHE
         if(!path.exists()){
             path.mkdirs()
         }
-        ALog.e("path= ${path.path}")
         return File(path,name)
     }
 }

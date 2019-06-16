@@ -16,8 +16,8 @@ open class BodyData<T :Any> :IState{
     private val observers = ArrayMap<((T)->Unit),ItemObserver<T>>()
     @Volatile private var mState = State_Created
     @Volatile private var postValue :Any = VALUE_NONE
-    @Volatile private var mValue :Any = VALUE_NONE
-    @Volatile private var mVersion = VERSION_NONE
+    private var mValue :Any = VALUE_NONE
+    private var mVersion = VERSION_NONE
     
     @Suppress("UNCHECKED_CAST")
     private val postCall :()->Unit = {
@@ -72,7 +72,7 @@ open class BodyData<T :Any> :IState{
 
     @Suppress("UNCHECKED_CAST")
     internal fun notifyDataChanged(){
-        if(State_Resumed == this.mState){
+        if(State_Resumed == this.mState && observers.size > 0){
             mValue.apply {
                 for (item in observers.values) {
                     if (item.version < mVersion && State_Resumed == mState) {

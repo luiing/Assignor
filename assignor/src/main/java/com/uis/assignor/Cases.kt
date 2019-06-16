@@ -41,3 +41,5 @@ data class CacheEntity(private var arg:Any?, var mills:Long = System.currentTime
     fun size() :Int = data.length
 }
 
+data class AsyncResult(var name:String,var value:Any)
+

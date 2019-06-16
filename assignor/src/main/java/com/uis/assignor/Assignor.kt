@@ -23,10 +23,9 @@ import java.io.File
 
 object Assignor {
 
-    private data class StateBodyStore(var code: Int, var store: BodyStore?)
     @JvmStatic private var app: Application? = null
     @JvmStatic private val cache :ICache by lazy { CacheImpl(File(app!!.filesDir,".assignor")) }
-    @JvmStatic private var observables = ArrayMap<Int, StateBodyStore>()
+    @JvmStatic private var observables = ArrayMap<Int, BodyStore>()
 
     @JvmStatic
     fun init(application: Application) {
@@ -71,17 +70,18 @@ object Assignor {
     }
 
     internal fun stateChange(code: Int, state: Int) {
-        observables[code]?.store?.apply {
+        observables[code]?.apply {
             onStateChanged(state)
             if (State_Destroy == state) {
                 observables.remove(code)
             }
         }
+        //ALog.e("BodyStore size is ${observables.size}")
     }
 
     internal fun init(code: Int): BodyStore{
-        return observables[code]?.store ?:  {store: BodyStore->
-            observables[code] =  StateBodyStore(code, store)
+        return observables[code] ?:  {store: BodyStore->
+            observables[code] =  store
             store
         }(BodyStore())
     }
@@ -98,8 +98,8 @@ object Assignor {
      * @param code see [Activity.hashCode]
      */
     @JvmStatic
-    fun of(code:Int):BodyStore?{
-        return observables[code]?.store
+    fun of(code:Int):BodyStore{
+        return init(code)
     }
 
     @JvmStatic
