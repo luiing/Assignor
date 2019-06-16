@@ -1,36 +1,42 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+  ~ Copyright (c) 2019 by uis
+  ~ Author: uis
+  ~ Github: https://github.com/luiing
+  -->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical" android:layout_width="match_parent"
     android:layout_height="match_parent">
-    <Button android:id="@+id/bt_demo"
+    <Button android:id="@+id/bt_selt"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="startDemo"
+        android:text="start self"
         />
-    <Button android:id="@+id/bt_self"
+    <Button android:id="@+id/bt_book"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="startSelf"
+        android:text="book"
         />
-    <Button android:id="@+id/bt_read"
+    <Button android:id="@+id/bt_book_list"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="read book"
+        android:text="book list"
         />
-    <Button android:id="@+id/bt_write"
+    <Button android:id="@+id/bt_person"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="write book"
+        android:text="person"
     />
-    <Button android:id="@+id/bt_remove_cache"
+    <Button android:id="@+id/bt_async"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="remove book memory cache"
+        android:text="async异步"
         />
-    <Button android:id="@+id/bt_get_books"
+    <Button android:id="@+id/bt_sync"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="get books for network"
+        android:text="sync同步"
         />
     <TextView android:id="@+id/tv_content"
         android:layout_width="match_parent"
