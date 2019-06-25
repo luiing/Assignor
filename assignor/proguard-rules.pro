@@ -1,3 +1,3 @@
--keepclassmembers class com.uis.assignor.case.**{
+-keepclassmembers class com.uis.assignor.CacheEntity{
     <fields>;
 }

@@ -6,7 +6,7 @@ android {
     compileSdkVersion compileVer
     buildToolsVersion buildVer
     defaultConfig {
-        applicationId "com.uis.connector.demo"
+        applicationId "com.uis.assignor.demo"
         minSdkVersion minsdkVer
         targetSdkVersion compileVer
         versionCode 1
@@ -25,6 +25,7 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'com.android.support:appcompat-v7:'+supportVer
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    implementation 'com.facebook.fresco:fresco:1.11.0'
-    implementation project(':lib-connector')
+    //implementation 'com.facebook.fresco:fresco:1.11.0'
+    implementation project(':assignor')
+    api "android.arch.lifecycle:extensions:1.1.1"
 }
