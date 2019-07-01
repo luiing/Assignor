@@ -11,8 +11,10 @@ import com.uis.assignor.utils.ALog
 
 class BodyStore :IState{
     private var models:ArrayMap<String,BodyModel> = ArrayMap()
+    @Volatile private var mState = State_Created
 
     override fun onStateChanged(state: Int) {
+        mState = state
         for(item in models.values){
             item.onStateChanged(state)
         }
@@ -27,6 +29,9 @@ class BodyStore :IState{
         val owner = models[key] ?: {
             val it = Assignor.createModel(cls)
             it.autoFindBodyModel()
+            if(State_Resumed == mState){
+                it.onStateChanged(mState)
+            }
             models.put(key, it)
             it
         }()
