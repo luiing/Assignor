@@ -45,7 +45,7 @@ open class BodyData<T :Any> :IState{
     }
 
     /**
-     * @return 获取缓存value
+     * @return 同步获取缓存value
      */
     @Suppress("unchecked_cast")
     fun getValue() :T?{
@@ -55,13 +55,19 @@ open class BodyData<T :Any> :IState{
         return null
     }
 
+    /** 异步取值，已经回调的值不会在回调 */
+    fun asyncValue(){
+        synchronized(postLock) {
+            notifyDataChanged()
+        }
+    }
+
+    /** value更新，回调总是在主线程 */
     fun setValue(v :T){
         if(Worker.isMainThread()) {
             mVersion++
             mValue = v
-            kotlin.runCatching{
-                notifyDataChanged()
-            }.exceptionOrNull()?.printStackTrace()
+            notifyDataChanged()
         }else{
             synchronized(postLock){
                 postValue = v
@@ -72,15 +78,17 @@ open class BodyData<T :Any> :IState{
 
     @Suppress("UNCHECKED_CAST")
     internal fun notifyDataChanged(){
-        if(State_Resumed == this.mState && observers.size > 0){
-            mValue.apply {
-                for (item in observers.values) {
-                    if (item.version < mVersion && State_Resumed == mState) {
-                        item.version = mVersion
-                        item.observer(this as T)
+        if(State_Resumed == this.mState && mValue != VALUE_NONE && observers.size > 0){
+            kotlin.runCatching{
+                mValue.apply {
+                    for (item in observers.values) {
+                        if (item.version < mVersion && State_Resumed == mState) {
+                            item.version = mVersion
+                            item.observer(this as T)
+                        }
                     }
                 }
-            }
+            }.exceptionOrNull()?.printStackTrace()
         }
     }
 
