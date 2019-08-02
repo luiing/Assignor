@@ -9,9 +9,13 @@ package com.uis.assignor
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
 import com.uis.assignor.cache.CacheImpl
 import com.uis.assignor.cache.ICache
 import com.uis.assignor.utils.ALog
+import com.uis.assignor.utils.TypeConvert
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
@@ -26,7 +30,6 @@ object Assignor {
     @JvmStatic private var app: Application? = null
     @JvmStatic private val cache :ICache by lazy { CacheImpl(File(app!!.filesDir,".assignor")) }
     @JvmStatic private var observables = ConcurrentHashMap<Int, BodyStore>()
-    @JvmStatic private val lock = Any()
 
     @JvmStatic
     fun init(application: Application) {
@@ -108,4 +111,20 @@ object Assignor {
 
     @JvmStatic
     fun cache(): ICache = cache
+
+    @JvmStatic fun<T> parseJson(content:String?,f:(T)->Unit):T {
+        return if(TypeConvert.convert(f) == String::class.java) content as T
+               else parseJson(content?.let{ JsonParser().parse(content)},f)
+    }
+
+    @JvmStatic fun<T> parseJson(element: JsonElement?, f:(T)->Unit):T{
+        val type = TypeConvert.convert(f)
+        return if(element == null){
+            null as T
+        }else if(type == null || type == String::class.java){
+            element.toString() as T
+        }else {
+            Gson().fromJson(element, type)
+        }
+    }
 }
