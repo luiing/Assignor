@@ -55,7 +55,7 @@ open class BodyData<T :Any> :IState{
         return null
     }
 
-    /** 异步取值，已经回调的值不会在回调 */
+    /** 异步回调在当前线程，已经回调的值不会在回调 */
     fun asyncValue(){
         synchronized(postLock) {
             notifyDataChanged()
