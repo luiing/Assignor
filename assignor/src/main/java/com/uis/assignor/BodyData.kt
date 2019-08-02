@@ -21,15 +21,9 @@ open class BodyData<T :Any> :IState{
     
     @Suppress("UNCHECKED_CAST")
     private val postCall :()->Unit = {
-        val v :Any
-        synchronized(postLock){
-             v = postValue
-            postValue = VALUE_NONE
-            return@synchronized
-        }
-        (v as? T)?.apply {
-            setValue(v)
-        }
+        val v :Any = postValue
+        postValue = VALUE_NONE
+        setValue(v as T)
     }
 
     override fun onStateChanged(state: Int) {

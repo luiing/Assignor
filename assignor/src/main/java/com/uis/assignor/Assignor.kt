@@ -9,11 +9,11 @@ package com.uis.assignor
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import android.support.v4.util.ArrayMap
 import com.uis.assignor.cache.CacheImpl
 import com.uis.assignor.cache.ICache
 import com.uis.assignor.utils.ALog
 import java.io.File
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * @autho uis
@@ -25,7 +25,8 @@ object Assignor {
 
     @JvmStatic private var app: Application? = null
     @JvmStatic private val cache :ICache by lazy { CacheImpl(File(app!!.filesDir,".assignor")) }
-    @JvmStatic private var observables = ArrayMap<Int, BodyStore>()
+    @JvmStatic private var observables = ConcurrentHashMap<Int, BodyStore>()
+    @JvmStatic private val lock = Any()
 
     @JvmStatic
     fun init(application: Application) {
@@ -70,7 +71,7 @@ object Assignor {
     }
 
     internal fun stateChange(code: Int, state: Int) {
-        init(code).apply {
+        getStore(code).apply {
             onStateChanged(state)
             if (State_Destroy == state) {
                 observables.remove(code)
@@ -79,33 +80,28 @@ object Assignor {
         //ALog.e("BodyStore size is ${observables.size}")
     }
 
-    internal fun init(code: Int): BodyStore{
-        return observables[code] ?:  {store: BodyStore->
-            observables[code] =  store
-            store
-        }(BodyStore())
+    @Synchronized internal fun getStore(code: Int): BodyStore{
+        var store = observables[code]
+        if(null == store){
+            store = BodyStore()
+            observables[code] = store
+        }
+        return store
     }
 
     @JvmStatic
-    fun of(activity: Activity): BodyStore {
+    fun<T:BodyModel> of(activity: Activity,f:(T)->Unit):T {
         activity.application?.apply {
             init(this)
         }
-        return init(activity.hashCode())
+        return of(activity.hashCode(),f)
     }
 
     /**
      * @param code see [Activity.hashCode]
      */
     @JvmStatic
-    fun of(code:Int):BodyStore{
-        return init(code)
-    }
-
-    @JvmStatic
-    fun<T:BodyModel> createModel(cls :Class<T>) :T{
-        return cls.newInstance()
-    }
+    fun<T:BodyModel> of(code:Int,f:(T)->Unit):T = getStore(code).get(f)
 
     @JvmStatic
     fun cache(parent : File): ICache = CacheImpl(parent)

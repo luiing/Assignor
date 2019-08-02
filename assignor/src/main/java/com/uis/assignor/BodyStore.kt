@@ -8,6 +8,7 @@ package com.uis.assignor
 
 import android.support.v4.util.ArrayMap
 import com.uis.assignor.utils.ALog
+import com.uis.assignor.utils.TypeConvert
 
 class BodyStore :IState{
     private var models:ArrayMap<String,BodyModel> = ArrayMap()
@@ -24,17 +25,22 @@ class BodyStore :IState{
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T :BodyModel> get(cls :Class<T>) :T {
-        val key = "com.uis.assignor.BodyModel.default:".plus(cls.name).plus(cls.canonicalName)
-        val owner = models[key] ?: {
-            val it = Assignor.createModel(cls)
-            it.autoFindBodyModel()
-            if(State_Resumed == mState){
-                it.onStateChanged(mState)
+    fun <T :BodyModel> get(f:(T)->Unit) :T {
+        val type = TypeConvert.convert(f)
+        val key = "BodyModel.default:".plus(type)
+        var owner = models[key]
+        if (null == owner) {
+            type as Class<*>
+            val model = type.newInstance()
+            if(model is BodyModel) {
+                model.autoFindBodyModel()
+                if (State_Resumed == mState) {
+                    model.onStateChanged(mState)
+                }
+                models[key] = model
+                owner = model
             }
-            models.put(key, it)
-            it
-        }()
-        return  owner as T
+        }
+        return owner as T
     }
 }
