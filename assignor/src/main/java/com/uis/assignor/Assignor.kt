@@ -10,9 +10,13 @@ import android.app.Activity
 import android.app.Application
 import android.os.Bundle
 import android.support.v4.util.ArrayMap
+import com.google.gson.Gson
+import com.google.gson.JsonElement
+import com.google.gson.JsonParser
 import com.uis.assignor.cache.CacheImpl
 import com.uis.assignor.cache.ICache
 import com.uis.assignor.utils.ALog
+import com.uis.assignor.utils.TypeConvert
 import java.io.File
 
 /**
@@ -112,4 +116,20 @@ object Assignor {
 
     @JvmStatic
     fun cache(): ICache = cache
+
+    @JvmStatic fun<T> parseJson(content:String?,f:(T)->Unit):T {
+        return if(TypeConvert.convert(f) == String::class.java) content as T
+               else parseJson(content?.let{ JsonParser().parse(content)},f)
+    }
+
+    @JvmStatic fun<T> parseJson(element: JsonElement?, f:(T)->Unit):T{
+        val type = TypeConvert.convert(f)
+        return if(element == null){
+            null as T
+        }else if(type == null || type == String::class.java){
+            element.toString() as T
+        }else {
+            Gson().fromJson(element, type)
+        }
+    }
 }

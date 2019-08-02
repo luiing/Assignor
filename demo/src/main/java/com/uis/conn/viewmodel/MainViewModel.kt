@@ -10,6 +10,7 @@ import android.os.SystemClock
 import android.text.TextUtils
 import com.google.gson.Gson
 import com.uis.assignor.Assignor
+import com.uis.assignor.utils.ALog
 import com.uis.assignor.works.Worker
 import com.uis.conn.data.Book
 import com.uis.conn.model.MainModel
@@ -27,7 +28,13 @@ class MainViewModel(var view: MainView?){
             view = null
         }
         model.book.observer {
+            ALog.e("book="+it.toString())
             view?.displayContent("name:".plus(it.name).plus(",price:¥").plus(it.price)
+                    .plus("\nwebsite:").plus(it.website))
+        }
+        model.book.observerOnce {
+            ALog.e("ONCE book="+it.toString())
+            view?.displayContent("ONCE name:".plus(it.name).plus(",price:¥").plus(it.price)
                     .plus("\nwebsite:").plus(it.website))
         }
         model.string.observer {
