@@ -13,7 +13,7 @@ Worker.mainExecute{} 主线程运行（内部异常处理）
 Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # Use
-    implementation 'com.uis:assignor:0.1.0'
+    implementation 'com.uis:assignor:0.2.0'
     
 ### Model Data用法
 
@@ -35,11 +35,13 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
     
     //监听数据，只有当Activity在OnResumed后OnPaused前会回调
     //如果不在该范围，下次重新进入范围继续回调
-    model.stringBody.addObserver{data->
+    model.stringBody.observer{data->
         ALog.e("string data= $data")
     }
-    //回调新加入observer,当body value不为空时
-    model.stringBody.asyncValue()
+    //只监听一次，之后不会在回调
+    model.stringBody.observerOnce{data->
+        ALog.e("string data= $data")
+    }
     
     //子线程设置value和直接设置value（最后都在主线程回调）
     Worker.ioExecute {
@@ -109,6 +111,7 @@ Version|Descipt|Fixed|Time
 0.0.1|缓存| |2019/6
 0.0.2|增加BodyData.asyncValue()方法|缓存混淆|2019/6
 0.1.0|BodyModel支持懒加载||2019/7
+0.2.0|废除BodyData.asyncValue，增加BodyData.observerOnce||2019/8
 
 
 
