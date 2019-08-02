@@ -21,7 +21,7 @@ import com.uis.conn.model.MainModel
  */
 
 class MainViewModel(var view: MainView?){
-    val model = Assignor.of(view.hashCode()).get(MainModel::class.java)
+    val model = Assignor.of<MainModel>(view.hashCode()){}
     init {
         model.destroy {
             view = null
