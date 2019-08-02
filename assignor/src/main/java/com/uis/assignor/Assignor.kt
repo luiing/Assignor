@@ -29,9 +29,9 @@ object Assignor {
 
     @JvmStatic
     fun init(application: Application) {
-        if (app == null) {
+        app ?: {
             synchronized(this) {
-                if (app == null) {
+                app ?: {
                     app = application
                     application.registerActivityLifecycleCallbacks(object : ActLifecycle() {
                         override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {
@@ -64,13 +64,13 @@ object Assignor {
                             }
                         }
                     })
-                }
+                }()
             }
-        }
+        }()
     }
 
     internal fun stateChange(code: Int, state: Int) {
-        observables[code]?.apply {
+        init(code).apply {
             onStateChanged(state)
             if (State_Destroy == state) {
                 observables.remove(code)
