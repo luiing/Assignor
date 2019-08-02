@@ -21,7 +21,7 @@ import kotlinx.android.synthetic.main.ui_demo.*
  */
 class DemoUi :Activity(){
 
-    private val model = Assignor.of<DemoModel>(this, f={})
+    private val model = Assignor.of<DemoModel>(this){}
 
     override fun onCreate(savedInstanceState: Bundle?) {
         model.firstLoad()
