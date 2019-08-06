@@ -13,7 +13,7 @@ Worker.mainExecute{} 主线程运行（内部异常处理）
 Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # Use
-    implementation 'com.uis:assignor:0.2.0'
+    implementation 'com.uis:assignor:0.2.2'
     
 ### Model Data用法
 
@@ -114,6 +114,7 @@ Version|Descipt|Fixed|Time
 0.0.2|增加BodyData.asyncValue()方法|缓存混淆|2019/6
 0.1.0|BodyModel支持懒加载||2019/7
 0.2.0|增加BodyData.observerOnce,范型新用法||2019/8
+0.2.2|增加BodyModel常驻方法,写文件缓存在子线程||2019/8
 
 
 
