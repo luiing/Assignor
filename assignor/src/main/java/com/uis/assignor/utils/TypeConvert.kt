@@ -25,12 +25,9 @@ object TypeConvert {
         if (types.isNotEmpty()) {
             result = convertType(types[0])
         }
-        if (result == null) {
-            cls.genericSuperclass?.let {
-                result = convertType(it)
-            }
+        return result ?: cls.genericSuperclass?.let {
+            convertType(it)
         }
-        return result
     }
 
     @JvmStatic
