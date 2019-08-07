@@ -9,6 +9,7 @@ package com.uis.assignor
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
+import android.support.v4.util.ArrayMap
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
@@ -29,7 +30,8 @@ object Assignor {
 
     @JvmStatic private var app: Application? = null
     @JvmStatic private val cache :ICache by lazy { CacheImpl(File(app!!.filesDir,".assignor")) }
-    @JvmStatic private var observables = ConcurrentHashMap<Int, BodyStore>()
+    @JvmStatic private var lifeObservers = ConcurrentHashMap<Int, BodyStore>()
+    @JvmStatic private var observables = ArrayMap<String, BodyStore>()
 
     @JvmStatic
     fun init(application: Application) {
@@ -77,20 +79,15 @@ object Assignor {
         getStore(code).apply {
             onStateChanged(state)
             if (State_Destroy == state) {
-                observables.remove(code)
+                lifeObservers.remove(code)
             }
         }
-        //ALog.e("BodyStore size is ${observables.size}")
     }
 
-    @Synchronized internal fun getStore(code: Int): BodyStore{
-        var store = observables[code]
-        if(null == store){
-            store = BodyStore()
-            observables[code] = store
+    @Synchronized internal fun getStore(code: Int): BodyStore = lifeObservers[code] ?:
+        BodyStore().apply {
+            lifeObservers[code] = this
         }
-        return store
-    }
 
     @JvmStatic
     fun<T:BodyModel> of(activity: Activity,f:(T)->Unit):T {
@@ -107,6 +104,15 @@ object Assignor {
     fun<T:BodyModel> of(code:Int,f:(T)->Unit):T = getStore(code).get(f)
 
     @JvmStatic
+    fun<T:BodyModel> stable(name:String,f:(T)->Unit):T = (observables[name] ?:
+        BodyStore(State_Resumed).apply {
+                observables[name] = this
+        }).get(f)
+
+    @JvmStatic
+    fun disable(name:String) = observables.remove(name)?.onStateChanged(State_Destroy)
+
+    @JvmStatic
     fun cache(parent : File): ICache = CacheImpl(parent)
 
     @JvmStatic
@@ -118,13 +124,14 @@ object Assignor {
     }
 
     @JvmStatic fun<T> parseJson(element: JsonElement?, f:(T)->Unit):T{
-        val type = TypeConvert.convert(f)
-        return if(element == null){
-            null as T
-        }else if(type == null || type == String::class.java){
-            element.toString() as T
-        }else {
-            Gson().fromJson(element, type)
-        }
+        return element?.let {_->
+            TypeConvert.convert(f)?.let {
+                if(it == String::class.java){
+                    element.toString() as T
+                }else{
+                    Gson().fromJson(element, it)
+                }
+            }
+        } ?: null as T
     }
 }
