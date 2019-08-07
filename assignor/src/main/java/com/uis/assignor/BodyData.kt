@@ -48,6 +48,11 @@ open class BodyData<T :Any> :IState{
         return null
     }
 
+    /** 清除缓存值*/
+    @Synchronized fun clearValue(){
+        mValue = VALUE_NONE
+    }
+
     @Synchronized private fun notifyValue(){
         if(mValue != VALUE_NONE && State_Resumed == this.mState) {
             if (Worker.isMainThread()) {
