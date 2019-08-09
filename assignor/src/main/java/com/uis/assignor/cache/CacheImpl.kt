@@ -14,6 +14,7 @@ import com.uis.assignor.NO_TIME_OUT
 import com.uis.assignor.utils.ALog
 import com.uis.assignor.utils.FileUtils
 import com.uis.assignor.utils.MD5
+import com.uis.assignor.works.Worker
 import java.io.File
 
 class CacheImpl(private var parent:File, private var maxSize :Int= DEFAULT_CACHE_SIZE):ICache {
@@ -36,29 +37,26 @@ class CacheImpl(private var parent:File, private var maxSize :Int= DEFAULT_CACHE
     }
 
     override fun readCache(name: String, mills: Long, isDisk: Boolean): String {
-        var entity:CacheEntity? = dataCache.get(name)
-        if(entity == null && isDisk) {
-            FileUtils.readFileInput(createFile(name))?.let {
-                Gson().fromJson(String(it), CacheEntity::class.java)?.let {
-                    entity = it
-                    dataCache.put(name,it)
+        return (dataCache.get(name) ?: {
+            if (isDisk) FileUtils.readFileInput(createFile(name))?.let {
+                Gson().fromJson(String(it), CacheEntity::class.java)?.let { entity ->
+                    dataCache.put(name, entity)
+                    entity
                 }
-            }
-        }
-        entity?.let {
-            if (mills == NO_TIME_OUT || (System.currentTimeMillis() - it.mills) < mills) {
-                return it.data
-            }
-        }
-        return ""
+            } else null
+        }())?.let {
+            if (mills == NO_TIME_OUT || (System.currentTimeMillis() - it.mills) < mills) it.data else ""
+        } ?: ""
     }
 
     override fun writeCache(name: String,value: Any, isDisk: Boolean) {
         val entity = CacheEntity(value)
         dataCache.put( name,entity)
         if(isDisk){
-            val data = Gson().newBuilder().disableHtmlEscaping().create().toJson(entity)
-            FileUtils.writeFileOutput(createFile(name),data.toByteArray())
+            Worker.ioExecute {
+                val data = Gson().newBuilder().disableHtmlEscaping().create().toJson(entity)
+                FileUtils.writeFileOutput(createFile(name),data.toByteArray())
+            }
         }
     }
 

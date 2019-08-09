@@ -17,7 +17,7 @@ import java.util.*
  */
 open class BodyModel :IState{
     private val states = LinkedList<IState>()
-    private var destroyCall :(()->Unit)? = null
+    private var calls :MutableList<(()->Unit)> = ArrayList()
 
     /** 自动注册 [BodyData] [IState] */
     internal fun autoFindBodyModel(cls :Class<*>? =javaClass){
@@ -55,15 +55,15 @@ open class BodyModel :IState{
         }
         if(State_Destroy == state){
             states.clear()
-            destroyCall?.apply {
-                this()
-                destroyCall = null
+            for (call in calls){
+                call()
             }
+            calls.clear()
         }
     }
 
     fun destroy(call :()->Unit){
-        destroyCall = call
+        calls.add(call)
     }
 
     fun addState(state :IState){

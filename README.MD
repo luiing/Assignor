@@ -13,7 +13,7 @@ Worker.mainExecute{} 主线程运行（内部异常处理）
 Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # Use
-    implementation 'com.uis:assignor:0.2.0'
+    implementation 'com.uis:assignor:0.2.4'
     
 ### Model Data用法
 
@@ -26,15 +26,17 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
         val intBody = BodyData<Int>()
     }
     
-    //创建Model,重复调用该方法会使用缓存，每个Activity只有一个同名Model
-    //Assignor.of()获取到一个BodyStore,接着通过无参构造函数获取DemoModel
-    //DemoModel创建后会自动查找BodyData相关变量，把生命周期关联到BodyData（无须手动关联）
-    //Activity生命周期传递:Assignor->BodyStor->DemoModel->BodyData
-    //Assignor.of(activity)此处使用的activit.hashCode(),不会内存泄露
-    val model = Assignor.of(this).get(DemoModel::class.java)
+    /** 创建Model,重复调用该方法会使用缓存，每个Activity只有一个同名Model
+        Assignor.of()获取到一个BodyStore,接着通过无参构造函数获取DemoModel
+        DemoModel创建后会自动查找BodyData相关变量，把生命周期关联到BodyData（无须手动关联）
+        Activity生命周期传递:Assignor->BodyStor->DemoModel->BodyData
+        Assignor.of(activity)此处使用的activit.hashCode(),不会内存泄露
+    */
+    val model = Assignor.of<DemoModel>(this){}
     
-    //监听数据，只有当Activity在OnResumed后OnPaused前会回调
-    //如果不在该范围，下次重新进入范围继续回调
+    /** 监听数据，只有当Activity在OnResumed后OnPaused前会回调
+        如果不在该范围，下次重新进入范围继续回调
+    */
     model.stringBody.observer{data->
         ALog.e("string data= $data")
     }
@@ -108,10 +110,10 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
 Version|Descipt|Fixed|Time
 ----|----|----|----
 0.0.1-CR1|预览版本| |2019/6
-0.0.1|缓存| |2019/6
 0.0.2|增加BodyData.asyncValue()方法|缓存混淆|2019/6
 0.1.0|BodyModel支持懒加载||2019/7
-0.2.0|废除BodyData.asyncValue，增加BodyData.observerOnce||2019/8
+0.2.0|增加BodyData.observerOnce,范型新用法||2019/8
+0.2.4|增加BodyModel常驻方法,写文件缓存在子线程,兼容java和kotlin写法||2019/8
 
 
 

@@ -7,11 +7,10 @@
 package com.uis.assignor
 
 import android.support.v4.util.ArrayMap
-import com.uis.assignor.utils.ALog
+import com.uis.assignor.utils.TypeConvert
 
-class BodyStore :IState{
+class BodyStore(@Volatile var mState:Int = State_Created) :IState{
     private var models:ArrayMap<String,BodyModel> = ArrayMap()
-    @Volatile private var mState = State_Created
 
     override fun onStateChanged(state: Int) {
         mState = state
@@ -24,17 +23,21 @@ class BodyStore :IState{
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T :BodyModel> get(cls :Class<T>) :T {
-        val key = "com.uis.assignor.BodyModel.default:".plus(cls.name).plus(cls.canonicalName)
-        val owner = models[key] ?: {
-            val it = Assignor.createModel(cls)
-            it.autoFindBodyModel()
-            if(State_Resumed == mState){
-                it.onStateChanged(mState)
-            }
-            models.put(key, it)
-            it
-        }()
-        return  owner as T
+    fun <B :BodyModel> get(f:(B)->Unit) :B =  getModel(TypeConvert.convert(f) as Class<out BodyModel>)as B
+
+    @Suppress("UNCHECKED_CAST")
+    fun <B :BodyModel> get(cls:Class<B>) :B = getModel(cls) as B
+
+    fun remove(cls:Class<out BodyModel>) = models.remove(getModelName(cls))
+
+    private fun getModel(cls:Class<out BodyModel>):BodyModel {
+        val key = getModelName(cls)
+        return models[key] ?: cls.newInstance().apply {
+            autoFindBodyModel()
+            if (State_Resumed == mState) onStateChanged(mState)
+            models[key] = this
+        }
     }
+
+    private fun getModelName(cls:Class<*>):String = "BodyModel.default:${cls.name}"
 }
