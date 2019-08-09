@@ -9,7 +9,6 @@ package com.uis.assignor
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import android.support.v4.util.ArrayMap
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
@@ -31,7 +30,7 @@ object Assignor {
     @JvmStatic private var app: Application? = null
     @JvmStatic private val cache :ICache by lazy { CacheImpl(File(app!!.filesDir,".assignor")) }
     @JvmStatic private var lifeObservers = ConcurrentHashMap<Int, BodyStore>()
-    @JvmStatic private var observables = ArrayMap<String, BodyStore>()
+    @JvmStatic private var stableStore = BodyStore(State_Resumed)
 
     @JvmStatic
     fun init(application: Application) {
@@ -84,7 +83,7 @@ object Assignor {
         }
     }
 
-    @Synchronized internal fun getStore(code: Int): BodyStore = lifeObservers[code] ?:
+    @Synchronized fun getStore(code: Int): BodyStore = lifeObservers[code] ?:
         BodyStore().apply {
             lifeObservers[code] = this
         }
@@ -104,13 +103,13 @@ object Assignor {
     fun<T:BodyModel> of(code:Int,f:(T)->Unit):T = getStore(code).get(f)
 
     @JvmStatic
-    fun<T:BodyModel> stable(name:String,f:(T)->Unit):T = (observables[name] ?:
-        BodyStore(State_Resumed).apply {
-                observables[name] = this
-        }).get(f)
+    fun<T:BodyModel> of(code:Int,cls:Class<T>):T = getStore(code).get(cls)
 
     @JvmStatic
-    fun disable(name:String) = observables.remove(name)?.onStateChanged(State_Destroy)
+    fun<T:BodyModel> of(activity: Activity,cls:Class<T>):T = getStore(activity.hashCode()).get(cls)
+
+    @JvmStatic
+    fun getStore():BodyStore = stableStore
 
     @JvmStatic
     fun cache(parent : File): ICache = CacheImpl(parent)
@@ -118,11 +117,13 @@ object Assignor {
     @JvmStatic
     fun cache(): ICache = cache
 
+    @Suppress("UNCHECKED_CAST")
     @JvmStatic fun<T> parseJson(content:String?,f:(T)->Unit):T {
         return if(TypeConvert.convert(f) == String::class.java) content as T
                else parseJson(content?.let{ JsonParser().parse(content)},f)
     }
 
+    @Suppress("UNCHECKED_CAST")
     @JvmStatic fun<T> parseJson(element: JsonElement?, f:(T)->Unit):T{
         return element?.let {_->
             TypeConvert.convert(f)?.let {
