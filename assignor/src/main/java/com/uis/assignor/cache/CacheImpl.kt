@@ -38,14 +38,14 @@ class CacheImpl(private var parent:File, private var maxSize :Int= DEFAULT_CACHE
 
     override fun readCache(name: String, mills: Long, isDisk: Boolean): String {
         return (dataCache.get(name) ?: {
-            if(isDisk) FileUtils.readFileInput(createFile(name))?.let{
-                Gson().fromJson(String(it), CacheEntity::class.java)?.let {entity->
-                    dataCache.put(name,entity)
+            if (isDisk) FileUtils.readFileInput(createFile(name))?.let {
+                Gson().fromJson(String(it), CacheEntity::class.java)?.let { entity ->
+                    dataCache.put(name, entity)
                     entity
                 }
-            }else null
+            } else null
         }())?.let {
-            if (mills == NO_TIME_OUT || (System.currentTimeMillis() - it.mills) < mills)it.data else ""
+            if (mills == NO_TIME_OUT || (System.currentTimeMillis() - it.mills) < mills) it.data else ""
         } ?: ""
     }
 
