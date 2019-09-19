@@ -96,17 +96,29 @@ object Assignor {
         return of(activity.hashCode(),f)
     }
 
-    /**
+    /** 同一个Activity只能有唯一个BodyModel
      * @param code see [Activity.hashCode]
      */
     @JvmStatic
     fun<T:BodyModel> of(code:Int,f:(T)->Unit):T = getStore(code).get(f)
 
+    /** 同一个Activity有一个name名称BodyModel(也就是Activity有多个name不同的BodyModel)
+     * @param code see [Activity.hashCode]
+     */
+    @JvmStatic
+    fun<T:BodyModel> of(code:Int,name:String,f:(T)->Unit):T = getStore(code).get(f,name)
+
     @JvmStatic
     fun<T:BodyModel> of(code:Int,cls:Class<T>):T = getStore(code).get(cls)
 
     @JvmStatic
+    fun<T:BodyModel> of(code:Int,name:String,cls:Class<T>):T = getStore(code).get(cls,name)
+
+    @JvmStatic
     fun<T:BodyModel> of(activity: Activity,cls:Class<T>):T = getStore(activity.hashCode()).get(cls)
+
+    @JvmStatic
+    fun<T:BodyModel> of(activity: Activity,name:String,cls:Class<T>):T = getStore(activity.hashCode()).get(cls,name)
 
     @JvmStatic
     fun getStore():BodyStore = stableStore
