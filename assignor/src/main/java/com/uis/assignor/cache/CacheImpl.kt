@@ -39,9 +39,13 @@ class CacheImpl(private var parent:File, private var maxSize :Int= DEFAULT_CACHE
     override fun readCache(name: String, mills: Long, isDisk: Boolean): String {
         return (dataCache.get(name) ?: {
             if (isDisk) FileUtils.readFileInput(createFile(name))?.let {
-                Gson().fromJson(String(it), CacheEntity::class.java)?.let { entity ->
-                    dataCache.put(name, entity)
-                    entity
+                try {
+                    Gson().fromJson(String(it), CacheEntity::class.java)?.let { entity ->
+                        dataCache.put(name, entity)
+                        entity
+                    }
+                }catch (ex:Throwable){
+                    return@let null
                 }
             } else null
         }())?.let {
