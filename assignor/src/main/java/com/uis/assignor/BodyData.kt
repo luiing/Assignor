@@ -107,12 +107,26 @@ open class BodyData<T :Any> :IState{
         notifyValue()
     }
 
+    fun observerStartNow(observer: (T)->Unit){
+        val code = observer.hashCode()
+        if(!observers.containsKey(code)){
+            observers[code] = ItemObserver(mVersion,observer)
+        }
+    }
+
     fun observerOnce(observer: (T)->Unit){
         val code = observer.hashCode()
         if(!observers.containsKey(code)){
             observers[code] = ItemObserver(VERSION_ONCE,observer)
         }
         notifyValue()
+    }
+
+    fun observerOnceStartNow(observer: (T)->Unit){
+        val code = observer.hashCode()
+        if(!observers.containsKey(code)){
+            observers[code] = ItemObserver(mVersion,observer)
+        }
     }
 
     fun removeObserver(observer: (T)->Unit){
