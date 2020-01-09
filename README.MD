@@ -13,7 +13,7 @@ Worker.mainExecute{} 主线程运行（内部异常处理）
 Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # Use
-    implementation 'com.uis:assignor:0.2.5'
+    implementation 'com.uis:assignor:0.3.0'
     
 ### Model Data用法
 
@@ -21,35 +21,35 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
     //在Application先调用，初始化生命周期监听（线程安全）
     Assignor.init(application)
     
-    class DemoData :BodyDataContainer() {
+    class DemoData :BodyModel() {
         val stringBody = BodyData<String>()
         val intBody = BodyData<Int>()
     }
     
-    /** 创建BodyDataContainer,重复调用该方法会使用缓存，每个Activity只有一个同名BodyDataContainer
+    /** 创建BodyModel,重复调用该方法会使用缓存，每个Activity只有一个同名BodyModel
         Assignor.of()获取到一个BodyStore,接着通过无参构造函数获取DemoData
         DemoData创建后会自动查找BodyData相关变量，把生命周期关联到BodyData（无须手动关联）
         Activity生命周期传递:Assignor->BodyStor->DemoMData->BodyData
         Assignor.of(activity)此处使用的activit.hashCode(),不会内存泄露
     */
-    val dataContainer = Assignor.of<DemoData>(this){}
+    val data = Assignor.of<DemoData>(this){}
     
     /** 监听数据，只有当Activity在OnResumed后OnPaused前会回调
         如果不在该范围，下次重新进入范围继续回调
     */
-    dataContainer.stringBody.observer{data->
+    data.stringBody.observer{data->
         ALog.e("string data= $data")
     }
     //只监听一次，之后不会在回调
-    dataContainer.stringBody.observerOnce{data->
+    data.stringBody.observerOnce{data->
         ALog.e("string data= $data")
     }
     
     //子线程设置value和直接设置value（最后都在主线程回调）
     Worker.ioExecute {
-        dataContainer.stringBody.setValue("action clicked test1")
+        data.stringBody.setValue("action clicked test1")
     }
-    dataContainer.stringBody.setValue("action clicked test1")
+    data.stringBody.setValue("action clicked test1")
     
     //获取最新缓存（没有值为NULL）
     ALog.e("cache value: "+test.stringBody.getValue())
@@ -115,7 +115,7 @@ Version|Descipt|Fixed|Time
 0.2.0|增加BodyData.observerOnce,范型新用法||2019/8
 0.2.4|增加BodyModel常驻方法,写文件缓存在子线程,兼容java和kotlin写法||2019/8
 0.2.5|支持activity存在多个同名BodyModel,需指定key||2019/9
-0.3.0|原BodyModel更改为BodyDataContainer，新增observerStartNow只监听新的回调||2019/11
+0.3.0|新增observerStartNow只监听新的回调，加入androidx||2019/12
 
 
 

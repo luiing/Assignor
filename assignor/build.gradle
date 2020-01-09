@@ -23,9 +23,9 @@ android {
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    compileOnly 'com.android.support:support-v4:'+supportVer
+    compileOnly 'androidx.legacy:legacy-support-v4:'+supportVer
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api "com.google.code.gson:gson:$gsonVer"
 }
 
-//apply from: '../../bintray.gradle'
+apply from: '../../bintray.gradle'

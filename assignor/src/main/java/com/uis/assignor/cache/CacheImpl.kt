@@ -6,7 +6,7 @@
 
 package com.uis.assignor.cache
 
-import android.support.v4.util.LruCache
+import androidx.collection.LruCache
 import com.google.gson.Gson
 import com.uis.assignor.CacheEntity
 import com.uis.assignor.DEFAULT_CACHE_SIZE
