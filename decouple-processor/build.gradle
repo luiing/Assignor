@@ -1,0 +1,9 @@
+apply plugin: 'java'
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':decouple-annotation')
+}
+sourceCompatibility = "1.8"
+targetCompatibility = "1.8"
+//apply from: '../../bintray.gradle'

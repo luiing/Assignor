@@ -7,6 +7,7 @@
 package com.uis.assignor
 
 import com.google.gson.Gson
+import com.uis.decouple.Hookup
 
 /**
  * @autho uis
@@ -21,7 +22,7 @@ const val State_SaveInstance = 2
 const val State_Paused = 3
 const val State_Created = 4
 const val State_Resumed = 5
-
+@Hookup("cacheEntity")
 data class CacheEntity(private var arg:Any?, var mills:Long = System.currentTimeMillis()) {
     var data :String = ""
 
@@ -40,6 +41,6 @@ data class CacheEntity(private var arg:Any?, var mills:Long = System.currentTime
 
     fun size() :Int = data.length
 }
-
+@Hookup("Result")
 data class AsyncResult(var name:String,var value:Any)
 
