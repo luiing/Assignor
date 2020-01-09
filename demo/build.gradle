@@ -11,6 +11,11 @@ android {
         targetSdkVersion compileVer
         versionCode 1
         versionName "1.0"
+//        javaCompileOptions{
+//            annotationProcessorOptions{
+//                includeCompileClasspath = true
+//            }
+//        }
     }
 
     buildTypes {
@@ -20,12 +25,14 @@ android {
         }
     }
 }
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'com.android.support:appcompat-v7:'+supportVer
+    api 'com.google.android.material:material:'+supportVer
+    api 'androidx.legacy:legacy-support-v4:'+supportVer
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //implementation 'com.facebook.fresco:fresco:1.11.0'
     implementation project(':assignor')
+    annotationProcessor project(':decouple-processor')
+    implementation project(':decouple-annotation')
     api "android.arch.lifecycle:extensions:1.1.1"
 }

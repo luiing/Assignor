@@ -6,11 +6,12 @@
 
 package com.uis.assignor
 
-import android.support.v4.util.ArrayMap
+
+import androidx.collection.ArrayMap
 import com.uis.assignor.utils.TypeConvert
 
 class BodyStore(@Volatile var mState:Int = State_Created) :IState{
-    private var models:ArrayMap<String,BodyModel> = ArrayMap()
+    private var models: ArrayMap<String, BodyModel> = ArrayMap()
 
     override fun onStateChanged(state: Int) {
         mState = state
