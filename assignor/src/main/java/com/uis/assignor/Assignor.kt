@@ -14,7 +14,6 @@ import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import com.uis.assignor.cache.CacheImpl
 import com.uis.assignor.cache.ICache
-import com.uis.assignor.utils.ALog
 import com.uis.assignor.utils.TypeConvert
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -89,7 +88,7 @@ object Assignor {
         }
 
     @JvmStatic
-    fun<T:BodyDataContainer> of(activity: Activity,f:(T)->Unit):T {
+    fun<T:BodyModel> of(activity: Activity, f:(T)->Unit):T {
         activity.application?.apply {
             init(this)
         }
@@ -100,25 +99,25 @@ object Assignor {
      * @param code see [Activity.hashCode]
      */
     @JvmStatic
-    fun<T:BodyDataContainer> of(code:Int,f:(T)->Unit):T = getStore(code).get(f)
+    fun<T:BodyModel> of(code:Int, f:(T)->Unit):T = getStore(code).get(f)
 
     /** 同一个Activity有一个name名称BodyDataContainer(也就是Activity有多个name不同的BodyDataContainer)
      * @param code see [Activity.hashCode]
      */
     @JvmStatic
-    fun<T:BodyDataContainer> of(code:Int,name:String,f:(T)->Unit):T = getStore(code).get(f,name)
+    fun<T:BodyModel> of(code:Int, name:String, f:(T)->Unit):T = getStore(code).get(f,name)
 
     @JvmStatic
-    fun<T:BodyDataContainer> of(code:Int,cls:Class<T>):T = getStore(code).get(cls)
+    fun<T:BodyModel> of(code:Int, cls:Class<T>):T = getStore(code).get(cls)
 
     @JvmStatic
-    fun<T:BodyDataContainer> of(code:Int,name:String,cls:Class<T>):T = getStore(code).get(cls,name)
+    fun<T:BodyModel> of(code:Int, name:String, cls:Class<T>):T = getStore(code).get(cls,name)
 
     @JvmStatic
-    fun<T:BodyDataContainer> of(activity: Activity,cls:Class<T>):T = getStore(activity.hashCode()).get(cls)
+    fun<T:BodyModel> of(activity: Activity, cls:Class<T>):T = getStore(activity.hashCode()).get(cls)
 
     @JvmStatic
-    fun<T:BodyDataContainer> of(activity: Activity,name:String,cls:Class<T>):T = getStore(activity.hashCode()).get(cls,name)
+    fun<T:BodyModel> of(activity: Activity, name:String, cls:Class<T>):T = getStore(activity.hashCode()).get(cls,name)
 
     @JvmStatic
     fun getStore():BodyStore = stableStore
