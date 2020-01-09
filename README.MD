@@ -13,7 +13,7 @@ Worker.mainExecute{} 主线程运行（内部异常处理）
 Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # Use
-    implementation 'com.uis:assignor:0.2.5'
+    implementation 'com.uis:assignor:0.3.0'
     
 ### Model Data用法
 
@@ -115,7 +115,7 @@ Version|Descipt|Fixed|Time
 0.2.0|增加BodyData.observerOnce,范型新用法||2019/8
 0.2.4|增加BodyModel常驻方法,写文件缓存在子线程,兼容java和kotlin写法||2019/8
 0.2.5|支持activity存在多个同名BodyModel,需指定key||2019/9
-0.3.0|新增observerStartNow只监听新的回调||2019/11
+0.3.0|新增observerStartNow只监听新的回调，加入androidx||2019/12
 
 
 
