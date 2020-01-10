@@ -43,7 +43,7 @@ public class DecoupleProcessor extends AbstractProcessor {
                         createHookFile(clsName,element);
                         System.out.println("---DecoupleProcessor generate success---");
                     }else{
-                        System.out.println("---DecoupleProcessor generate fail:" + element.toString()+" should implements OnDecouble");
+                        System.out.println("---DecoupleProcessor generate fail:" + element.toString()+" should implements ICouple");
                     }
                 }
             }
@@ -57,11 +57,11 @@ public class DecoupleProcessor extends AbstractProcessor {
             JavaFileObject javaFile = filer.createSourceFile(pkgName+"."+extName);
             BufferedWriter writer = new BufferedWriter(javaFile.openWriter());
             writer.write("package "+pkgName+";\n\n");
-            writer.write("import "+Generate.class.getName()+";\n\n");
+            writer.write("import "+Generate.class.getName()+";\n");
             writer.write("import com.uis.assignor.couple.IDecouple;\n\n");
             writer.write("public class "+extName+"{\n\n");
-            writer.write("    public final static IDecouple "+Generate.generateName+" = new "+element.toString()+"();\n\n");
-            writer.write("}\n\n");
+            writer.write("    public final IDecouple "+Generate.generateName+" = new "+element.toString()+"();\n\n");
+            writer.write("}\n");
             writer.flush();
             writer.close();
         }catch (Exception ex){

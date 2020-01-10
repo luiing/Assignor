@@ -1,5 +1,8 @@
 package com.uis.assignor.couple;
 
+import android.text.TextUtils;
+
+import androidx.annotation.NonNull;
 import androidx.collection.ArrayMap;
 import com.uis.assignor.utils.ALog;
 import com.uis.assignor.works.Worker;
@@ -23,7 +26,7 @@ public final class Couple {
      * @param coupleName
      * @return
      */
-    public static ParamsBuilder newParams(String coupleName){
+    public static ParamsBuilder newParams(@NonNull String coupleName){
         return new ParamsBuilder(coupleName);
     }
 
@@ -36,9 +39,6 @@ public final class Couple {
         return new ResultBuilder( cid);
     }
 
-    private Couple(){
-
-    }
 
     public final static class Result {
 
@@ -69,9 +69,9 @@ public final class Couple {
     }
 
     public final static class ResultBuilder{
-        Result result = new Result();
+        private Result result = new Result();
 
-        ResultBuilder(int cid) {
+        private ResultBuilder(int cid) {
             this.result.id = cid;
         }
 
@@ -102,10 +102,6 @@ public final class Couple {
         }
 
         public Result build(){
-            return result;
-        }
-
-        public void notifyResult(){
             final IResult iResult = sResult.remove(result.id);
             if(iResult != null){
                 Worker.mainExecute(new Function0<Unit>() {
@@ -116,13 +112,14 @@ public final class Couple {
                     }
                 },0);
             }
+            return result;
         }
     }
 
     public final static class Params {
 
         public String coupleName;
-        public String coupleAction;
+        public String coupleAction = "";
         public int id = sCounter++;
         private JSONObject data;
 
@@ -146,9 +143,9 @@ public final class Couple {
     }
 
     public final static class ParamsBuilder{
-        Params param = new Params();
+        private Params param = new Params();
 
-        ParamsBuilder(String name) {
+        private ParamsBuilder(@NonNull String name) {
             param.coupleName = name;
         }
 
@@ -172,7 +169,7 @@ public final class Couple {
             return this;
         }
 
-        public Result exec(){
+        public Result call(){
             IDecouple iDecouple = getDecouple();
             if(iDecouple != null){
                 return iDecouple.onCall(param);
@@ -180,32 +177,34 @@ public final class Couple {
             return newResult(param.id).error(404,"Not found "+param.coupleName).build();
         }
 
-        public void exec(IResult result){
+        public void call(IResult result){
             final IDecouple iDecouple = getDecouple();
+            sResult.put(param.id,result);
             if(iDecouple != null){
-                sResult.put(param.id,result);
                 Worker.ioExecute(new Function0<Unit>() {
                     @Override
                     public Unit invoke() {
-                        iDecouple.onDecouple(param);
+                        iDecouple.onCallback(param);
                         return null;
                     }
                 });
             }else{
-                result.onResult(newResult(param.id).error(404,"Not found "+param.coupleName).build());
+                newResult(param.id).error(404,"Not found "+param.coupleName).build();
             }
         }
 
         private IDecouple getDecouple(){
-            WeakReference<IDecouple> ref = sCouples.get(param.coupleName);
             IDecouple couple = null;
-            if(ref != null){
-                couple = ref.get();
-            }
-            if(couple == null){
-                couple = createDecouple();
-                if(couple != null) {
-                    sCouples.put(param.coupleName, new WeakReference<>(couple));
+            if(!TextUtils.isEmpty(param.coupleName)) {
+                WeakReference<IDecouple> ref = sCouples.get(param.coupleName);
+                if (ref != null) {
+                    couple = ref.get();
+                }
+                if (couple == null) {
+                    couple = createDecouple();
+                    if (couple != null) {
+                        sCouples.put(param.coupleName, new WeakReference<>(couple));
+                    }
                 }
             }
             return couple;
@@ -217,7 +216,7 @@ public final class Couple {
                 Class<?> cls = Class.forName(clsName);
                 Field field = cls.getField(Generate.generateName);
                 field.setAccessible(true);
-                Object iDecouple = field.get(cls);
+                Object iDecouple = field.get(cls.newInstance());
                 if(iDecouple != null) {
                     ALog.d("Create "+cls.getName()+",coupleName="+param.coupleName);
                     return (IDecouple)iDecouple;

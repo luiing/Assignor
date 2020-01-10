@@ -54,10 +54,15 @@ public class MainUi extends AppCompatActivity implements View.OnClickListener, M
             startActivity(new Intent(this,DemoUi.class));
         }else if(R.id.bt_read == id){
             viewModel.readBook();
-            Couple.newParams("test").exec();
-            Couple.Result result = Couple.newParams("Test").exec();
+
+            Couple.Result result = Couple.newParams("Test")
+                    .setAction("a")
+                    .addParam("key","111")
+                    .call();
             ALog.e(result.toString());
-            Couple.newParams("Test").exec(new IResult() {
+            Couple.newParams("Test")
+                    .setAction("b")
+                    .addParam("key","222").call(new IResult() {
                 @Override
                 public void onResult(Couple.Result result) {
                     ALog.e(result.toString());
@@ -65,9 +70,9 @@ public class MainUi extends AppCompatActivity implements View.OnClickListener, M
             });
 
         }else if(R.id.bt_write == id){
-            Couple.Result result = Couple.newParams("Assignor").exec();
+            Couple.Result result = Couple.newParams("Assignor").call();
             ALog.e(result.toString());
-            Couple.newParams("Assignor").exec(new IResult() {
+            Couple.newParams("Assignor").call(new IResult() {
                 @Override
                 public void onResult(Couple.Result result) {
                     ALog.e(result.toString());

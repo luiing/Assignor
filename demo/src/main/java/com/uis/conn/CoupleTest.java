@@ -9,13 +9,14 @@ import com.uis.decouple.BindCouple;
 @BindCouple("Test")
 public class CoupleTest extends SimpleDecouple {
     @Override
-    public void onDecouple(Couple.Params param) {
-        SystemClock.sleep(2000);
-        Couple.newResult(param.id).success().addParam("name","Test onDecouple() call").notifyResult();
+    public void onCallback(Couple.Params param) {
+        SystemClock.sleep(5000);
+        Couple.newResult(param.id).success().addParam("name",param.toString()).build();
     }
 
     @Override
     public Couple.Result onCall(Couple.Params param) {
-        return Couple.newResult(param.id).success().addParam("name","Test onCall() call").build();
+
+        return Couple.newResult(param.id).success().addParam("name",param.toString()).build();
     }
 }
