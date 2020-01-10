@@ -212,19 +212,19 @@ public final class Couple {
         }
 
         private IDecouple createDecouple(){
+            String clsName = Generate.generatePkg + "." + param.coupleName+Generate.generate;
             try {
-                Class<?> cls = Class.forName(Generate.generatePkg + "." + param.coupleName+Generate.generate);
+                Class<?> cls = Class.forName(clsName);
                 Field field = cls.getField(Generate.generateName);
                 field.setAccessible(true);
-                cls = (Class<?>)field.get(cls);
-                if(cls != null) {
+                Object iDecouple = field.get(cls);
+                if(iDecouple != null) {
                     ALog.d("Create "+cls.getName()+",coupleName="+param.coupleName);
-                    return (IDecouple) cls.newInstance();
+                    return (IDecouple)iDecouple;
                 }
             }catch (Throwable ex){
-                ex.printStackTrace();
+                ALog.w("------ Not found "+clsName+" ------");
             }
-            ALog.w("------ Not found "+param.coupleName+" ------");
             return null;
         }
     }

@@ -58,8 +58,9 @@ public class DecoupleProcessor extends AbstractProcessor {
             BufferedWriter writer = new BufferedWriter(javaFile.openWriter());
             writer.write("package "+pkgName+";\n\n");
             writer.write("import "+Generate.class.getName()+";\n\n");
+            writer.write("import com.uis.assignor.couple.IDecouple;\n\n");
             writer.write("public class "+extName+"{\n\n");
-            writer.write("    public final static Class<?> "+Generate.generateName+" = "+element.toString()+".class;\n\n");
+            writer.write("    public final static IDecouple "+Generate.generateName+" = new "+element.toString()+"();\n\n");
             writer.write("}\n\n");
             writer.flush();
             writer.close();
