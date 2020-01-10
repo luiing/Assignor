@@ -9,6 +9,11 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.uis.assignor.couple.Couple;
+import com.uis.assignor.couple.CoupleParam;
+import com.uis.assignor.couple.CoupleResult;
+import com.uis.assignor.couple.IResult;
+import com.uis.assignor.utils.ALog;
 import com.uis.conn.viewmodel.MainView;
 import com.uis.conn.viewmodel.MainViewModel;
 import com.uis.connector.demo.R;
@@ -51,7 +56,26 @@ public class MainUi extends AppCompatActivity implements View.OnClickListener, M
             startActivity(new Intent(this,DemoUi.class));
         }else if(R.id.bt_read == id){
             viewModel.readBook();
+            CoupleResult result = Couple.builder(CoupleParam.createParam("Test").build()).exec();
+            ALog.e("result:"+result.success+",dat="+result.getData().toString());
+            Couple.builder(CoupleParam.createParam("Test").build()).exec(new IResult() {
+                @Override
+                public void onResult(CoupleResult result) {
+                    ALog.e("result:"+result.success+",data="+result.getData().toString());
+                }
+            });
+
         }else if(R.id.bt_write == id){
+            CoupleResult result = Couple.builder(CoupleParam.createParam("Assignor").build()).exec();
+            ALog.e("result:"+result.success+",data="+result.getData().toString());
+            Couple.builder(CoupleParam.createParam("Assignor").build()).exec(new IResult() {
+                @Override
+                public void onResult(CoupleResult result) {
+                    ALog.e("result:"+result.success+",data="+result.getData().toString());
+                }
+            });
+
+
             viewModel.writeBook();
         }else if(R.id.bt_remove_cache == id){
             viewModel.removeMemoryCache();

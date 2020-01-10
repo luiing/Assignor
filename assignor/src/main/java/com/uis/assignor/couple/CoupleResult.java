@@ -5,8 +5,8 @@ import org.json.JSONObject;
 public class CoupleResult {
     private JSONObject data;
     public int id;
-    public String errorTxt;
-    public int errorCode;
+    public String errorTxt = "";
+    public int errorCode = 0;
     public boolean success;
 
     private CoupleResult(){
@@ -28,7 +28,7 @@ public class CoupleResult {
             this.result.id = cid;
         }
 
-        public ResultBuilder success(String action){
+        public ResultBuilder success(){
             this.result.success = true;
             return this;
         }
