@@ -27,8 +27,8 @@ dependencies {
     compileOnly 'androidx.legacy:legacy-support-v4:'+supportVer
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api "com.google.code.gson:gson:$gsonVer"
-    implementation project(':decouple-annotation')
-    //annotationProcessor project(':decouple-processor')
+    compileOnly project(':decouple-annotation')
+
     kapt project(':decouple-processor')
 }
 
