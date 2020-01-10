@@ -10,8 +10,6 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.uis.assignor.couple.Couple;
-import com.uis.assignor.couple.CoupleParam;
-import com.uis.assignor.couple.CoupleResult;
 import com.uis.assignor.couple.IResult;
 import com.uis.assignor.utils.ALog;
 import com.uis.conn.viewmodel.MainView;
@@ -56,25 +54,25 @@ public class MainUi extends AppCompatActivity implements View.OnClickListener, M
             startActivity(new Intent(this,DemoUi.class));
         }else if(R.id.bt_read == id){
             viewModel.readBook();
-            CoupleResult result = Couple.builder(CoupleParam.createParam("Test").build()).exec();
-            ALog.e("result:"+result.success+",dat="+result.getData().toString());
-            Couple.builder(CoupleParam.createParam("Test").build()).exec(new IResult() {
+            Couple.newParams("test").exec();
+            Couple.Result result = Couple.newParams("Test").exec();
+            ALog.e(result.toString());
+            Couple.newParams("Test").exec(new IResult() {
                 @Override
-                public void onResult(CoupleResult result) {
-                    ALog.e("result:"+result.success+",data="+result.getData().toString());
+                public void onResult(Couple.Result result) {
+                    ALog.e(result.toString());
                 }
             });
 
         }else if(R.id.bt_write == id){
-            CoupleResult result = Couple.builder(CoupleParam.createParam("Assignor").build()).exec();
-            ALog.e("result:"+result.success+",data="+result.getData().toString());
-            Couple.builder(CoupleParam.createParam("Assignor").build()).exec(new IResult() {
+            Couple.Result result = Couple.newParams("Assignor").exec();
+            ALog.e(result.toString());
+            Couple.newParams("Assignor").exec(new IResult() {
                 @Override
-                public void onResult(CoupleResult result) {
-                    ALog.e("result:"+result.success+",data="+result.getData().toString());
+                public void onResult(Couple.Result result) {
+                    ALog.e(result.toString());
                 }
             });
-
 
             viewModel.writeBook();
         }else if(R.id.bt_remove_cache == id){
