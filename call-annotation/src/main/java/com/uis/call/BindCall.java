@@ -1,4 +1,10 @@
-package com.uis.decouple;
+/*
+ * Copyright (c) 2020 by uis
+ * Author: uis
+ * Github: https://github.com/luiing
+ */
+
+package com.uis.call;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,6 +13,6 @@ import java.lang.annotation.Target;
 
 @Target(ElementType.TYPE)
 @Retention(RetentionPolicy.CLASS)
-public @interface BindCouple {
+public @interface BindCall {
     String value() default "";
 }

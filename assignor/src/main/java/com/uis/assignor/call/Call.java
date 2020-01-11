@@ -6,7 +6,7 @@ import androidx.annotation.NonNull;
 import androidx.collection.ArrayMap;
 
 import com.uis.assignor.works.Worker;
-import com.uis.decouple.BindCoupleUtils;
+import com.uis.call.BindCallUtils;
 
 import org.json.JSONObject;
 import java.lang.ref.WeakReference;
@@ -201,7 +201,7 @@ public final class Call {
                     couple = ref.get();
                 }
                 if (couple == null) {
-                    Object value = BindCoupleUtils.getBindCoupleValue(param.coupleName);
+                    Object value = BindCallUtils.getCallValue(param.coupleName);
                     if (value != null) {
                         couple = (ICall) value;
                         sCall.put(param.coupleName, new WeakReference<>(couple));

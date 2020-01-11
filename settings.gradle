@@ -1,3 +1,3 @@
-include ':demo',':assignor', ':decouple-processor', ':decouple-annotation'
+include ':demo',':assignor', ':call-processor', ':call-annotation'
 
 

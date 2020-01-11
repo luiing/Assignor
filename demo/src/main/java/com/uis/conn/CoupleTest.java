@@ -4,9 +4,9 @@ import android.os.SystemClock;
 
 import com.uis.assignor.call.Call;
 import com.uis.assignor.call.SimpleCall;
-import com.uis.decouple.BindCouple;
+import com.uis.call.BindCall;
 
-@BindCouple("Test")
+@BindCall("Test")
 public class CoupleTest extends SimpleCall {
     @Override
     public void onCallback(Call.Params param) {

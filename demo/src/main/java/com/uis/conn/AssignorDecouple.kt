@@ -8,9 +8,9 @@ package com.uis.conn
 
 import com.uis.assignor.call.Call
 import com.uis.assignor.call.SimpleCall
-import com.uis.decouple.BindCouple
+import com.uis.call.BindCall
 
-@BindCouple("Assignor")
+@BindCall("Assignor")
 class AssignorDecouple : SimpleCall() {
     override fun onCallback(param: Call.Params) {
         Call.newResult(param.id).success().build()

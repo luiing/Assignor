@@ -34,8 +34,8 @@ dependencies {
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //implementation 'com.facebook.fresco:fresco:1.11.0'
     implementation project(':assignor')
-    implementation project(':decouple-annotation')
+    implementation project(':call-annotation')
 
     //annotationProcessor project(':decouple-processor')
-    kapt project(':decouple-processor')
+    kapt project(':call-processor')
 }

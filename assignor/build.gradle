@@ -27,9 +27,9 @@ dependencies {
     compileOnly 'androidx.legacy:legacy-support-v4:'+supportVer
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api "com.google.code.gson:gson:$gsonVer"
-    compileOnly project(':decouple-annotation')
+    compileOnly project(':call-annotation')
 
-    kapt project(':decouple-processor')
+    kapt project(':call-processor')
 }
 
 //apply from: '../../bintray.gradle'
