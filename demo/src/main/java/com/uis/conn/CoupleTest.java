@@ -2,21 +2,21 @@ package com.uis.conn;
 
 import android.os.SystemClock;
 
-import com.uis.assignor.couple.Couple;
-import com.uis.assignor.couple.SimpleDecouple;
+import com.uis.assignor.call.Call;
+import com.uis.assignor.call.SimpleCall;
 import com.uis.decouple.BindCouple;
 
 @BindCouple("Test")
-public class CoupleTest extends SimpleDecouple {
+public class CoupleTest extends SimpleCall {
     @Override
-    public void onCallback(Couple.Params param) {
-        SystemClock.sleep(5000);
-        Couple.newResult(param.id).success().addParam("name",param.toString()).build();
+    public void onCallback(Call.Params param) {
+        SystemClock.sleep(2000);
+        Call.newResult(param.id).success().addParam("name",param.toString()).build();
     }
 
     @Override
-    public Couple.Result onCall(Couple.Params param) {
+    public Call.Result onCall(Call.Params param) {
 
-        return Couple.newResult(param.id).success().addParam("name",param.toString()).build();
+        return Call.newResult(param.id).success().addParam("name",param.toString()).build();
     }
 }

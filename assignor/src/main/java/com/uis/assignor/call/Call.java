@@ -1,23 +1,23 @@
-package com.uis.assignor.couple;
+package com.uis.assignor.call;
 
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
 import androidx.collection.ArrayMap;
-import com.uis.assignor.utils.ALog;
+
 import com.uis.assignor.works.Worker;
-import com.uis.decouple.Generate;
+import com.uis.decouple.BindCoupleUtils;
+
 import org.json.JSONObject;
 import java.lang.ref.WeakReference;
-import java.lang.reflect.Field;
 import java.util.concurrent.ConcurrentHashMap;
 import kotlin.Unit;
 import kotlin.jvm.Volatile;
 import kotlin.jvm.functions.Function0;
 
-public final class Couple {
+public final class Call {
 
-    private static ConcurrentHashMap<String, WeakReference<IDecouple>> sCouples = new ConcurrentHashMap<>();
+    private static ConcurrentHashMap<String, WeakReference<ICall>> sCall = new ConcurrentHashMap<>();
     private static ArrayMap<Integer, IResult> sResult = new ArrayMap<>();
     private static @Volatile int sCounter = 1;
 
@@ -170,15 +170,15 @@ public final class Couple {
         }
 
         public Result call(){
-            IDecouple iDecouple = getDecouple();
-            if(iDecouple != null){
-                return iDecouple.onCall(param);
+            ICall call = getCall();
+            if(call != null){
+                return call.onCall(param);
             }
             return newResult(param.id).error(404,"Not found "+param.coupleName).build();
         }
 
         public void call(IResult result){
-            final IDecouple iDecouple = getDecouple();
+            final ICall iDecouple = getCall();
             sResult.put(param.id,result);
             if(iDecouple != null){
                 Worker.ioExecute(new Function0<Unit>() {
@@ -193,38 +193,22 @@ public final class Couple {
             }
         }
 
-        private IDecouple getDecouple(){
-            IDecouple couple = null;
+        private ICall getCall(){
+            ICall couple = null;
             if(!TextUtils.isEmpty(param.coupleName)) {
-                WeakReference<IDecouple> ref = sCouples.get(param.coupleName);
+                WeakReference<ICall> ref = sCall.get(param.coupleName);
                 if (ref != null) {
                     couple = ref.get();
                 }
                 if (couple == null) {
-                    couple = createDecouple();
-                    if (couple != null) {
-                        sCouples.put(param.coupleName, new WeakReference<>(couple));
+                    Object value = BindCoupleUtils.getBindCoupleValue(param.coupleName);
+                    if (value != null) {
+                        couple = (ICall) value;
+                        sCall.put(param.coupleName, new WeakReference<>(couple));
                     }
                 }
             }
             return couple;
-        }
-
-        private IDecouple createDecouple(){
-            String clsName = Generate.generatePkg + "." + param.coupleName+Generate.generate;
-            try {
-                Class<?> cls = Class.forName(clsName);
-                Field field = cls.getField(Generate.generateName);
-                field.setAccessible(true);
-                Object iDecouple = field.get(cls.newInstance());
-                if(iDecouple != null) {
-                    ALog.d("Create "+cls.getName()+",coupleName="+param.coupleName);
-                    return (IDecouple)iDecouple;
-                }
-            }catch (Throwable ex){
-                ALog.w("------ Not found "+clsName+" ------");
-            }
-            return null;
         }
     }
 }

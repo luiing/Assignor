@@ -6,17 +6,17 @@
 
 package com.uis.conn
 
-import com.uis.assignor.couple.Couple
-import com.uis.assignor.couple.SimpleDecouple
+import com.uis.assignor.call.Call
+import com.uis.assignor.call.SimpleCall
 import com.uis.decouple.BindCouple
 
 @BindCouple("Assignor")
-class AssignorDecouple : SimpleDecouple() {
-    override fun onCallback(param: Couple.Params) {
-        Couple.newResult(param.id).success().build()
+class AssignorDecouple : SimpleCall() {
+    override fun onCallback(param: Call.Params) {
+        Call.newResult(param.id).success().build()
     }
 
-    override fun onCall(param: Couple.Params): Couple.Result {
-        return Couple.newResult(param.id).success().build()
+    override fun onCall(param: Call.Params): Call.Result {
+        return Call.newResult(param.id).success().build()
     }
 }

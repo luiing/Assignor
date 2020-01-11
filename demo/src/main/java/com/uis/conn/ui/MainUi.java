@@ -9,8 +9,8 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.uis.assignor.couple.Couple;
-import com.uis.assignor.couple.IResult;
+import com.uis.assignor.call.Call;
+import com.uis.assignor.call.IResult;
 import com.uis.assignor.utils.ALog;
 import com.uis.conn.viewmodel.MainView;
 import com.uis.conn.viewmodel.MainViewModel;
@@ -55,26 +55,26 @@ public class MainUi extends AppCompatActivity implements View.OnClickListener, M
         }else if(R.id.bt_read == id){
             viewModel.readBook();
 
-            Couple.Result result = Couple.newParams("Test")
+            Call.Result result = Call.newParams("Test")
                     .setAction("a")
                     .addParam("key","111")
                     .call();
             ALog.e(result.toString());
-            Couple.newParams("Test")
+            Call.newParams("Test")
                     .setAction("b")
                     .addParam("key","222").call(new IResult() {
                 @Override
-                public void onResult(Couple.Result result) {
+                public void onResult(Call.Result result) {
                     ALog.e(result.toString());
                 }
             });
 
         }else if(R.id.bt_write == id){
-            Couple.Result result = Couple.newParams("Assignor").call();
+            Call.Result result = Call.newParams("Assignor").call();
             ALog.e(result.toString());
-            Couple.newParams("Assignor").call(new IResult() {
+            Call.newParams("Assignor").call(new IResult() {
                 @Override
-                public void onResult(Couple.Result result) {
+                public void onResult(Call.Result result) {
                     ALog.e(result.toString());
                 }
             });
