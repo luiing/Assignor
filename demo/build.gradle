@@ -1,6 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
     compileSdkVersion compileVer
@@ -11,20 +12,29 @@ android {
         targetSdkVersion compileVer
         versionCode 1
         versionName "1.0"
+//        javaCompileOptions{
+//            annotationProcessorOptions{
+//                includeCompileClasspath = true
+//            }
+//        }
     }
 
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
+            zipAlignEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
 }
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation 'androidx.appcompat:appcompat:'+supportVer
+    api 'com.google.android.material:material:'+supportVer
+    api 'androidx.legacy:legacy-support-v4:'+supportVer
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     //implementation 'com.facebook.fresco:fresco:1.11.0'
     implementation project(':assignor')
+    implementation 'com.uis:call-annotation:0.0.1'//project(':call-annotation')
+
+    kapt 'com.uis:call-processor:0.0.1'//project(':call-processor')
 }

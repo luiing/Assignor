@@ -7,7 +7,6 @@
 package com.uis.assignor
 
 import com.google.gson.Gson
-
 /**
  * @autho uis
  * @date 2019-05-30

@@ -7,9 +7,6 @@
 package com.uis.assignor.works
 import android.os.Handler
 import android.os.Looper
-import com.uis.assignor.cache.ICache
-import com.uis.assignor.cache.CacheImpl
-import java.io.File
 import java.util.concurrent.Executors
 
 object Worker{
