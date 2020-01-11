@@ -27,7 +27,7 @@ dependencies {
     compileOnly 'androidx.legacy:legacy-support-v4:'+supportVer
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api "com.google.code.gson:gson:$gsonVer"
-    compileOnly project(':call-annotation')
+    api 'com.uis:call-annotation:0.0.1'
 }
 
-apply from: '../../bintray.gradle'
+//apply from: '../../../bintray.gradle'
