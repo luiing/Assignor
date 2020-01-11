@@ -15,6 +15,9 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
 # Use
     implementation 'com.uis:assignor:0.3.0'
     
+# Personal Maven
+    maven { url 'https://dl.bintray.com/sweet/maven'}    
+    
 ### Model Data用法
 
 ```
