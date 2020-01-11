@@ -6,7 +6,6 @@
 
 package com.uis.assignor
 
-import com.uis.assignor.utils.ALog
 import java.util.*
 
 /**
@@ -20,7 +19,7 @@ open class BodyModel :IState{
     private var calls :MutableList<(()->Unit)> = ArrayList()
 
     /** 自动注册 [BodyData] [IState] */
-    internal fun autoFindBodyModel(cls :Class<*>? =javaClass){
+    internal fun autoFindBodyData(cls :Class<*>? =javaClass){
         cls?.let {
             for( field in it.declaredFields){
                 //ALog.e("field name ${field.name},${field.type},"+(field.type == BodyData::class.java))
@@ -33,7 +32,7 @@ open class BodyModel :IState{
                     }
                 }
             }
-            autoFindBodyModel(it.superclass)
+            autoFindBodyData(it.superclass)
         }
     }
 
