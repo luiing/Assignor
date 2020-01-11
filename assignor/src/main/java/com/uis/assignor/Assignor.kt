@@ -9,13 +9,11 @@ package com.uis.assignor
 import android.app.Activity
 import android.app.Application
 import android.os.Bundle
-import android.support.v4.util.ArrayMap
 import com.google.gson.Gson
 import com.google.gson.JsonElement
 import com.google.gson.JsonParser
 import com.uis.assignor.cache.CacheImpl
 import com.uis.assignor.cache.ICache
-import com.uis.assignor.utils.ALog
 import com.uis.assignor.utils.TypeConvert
 import java.io.File
 import java.util.concurrent.ConcurrentHashMap
@@ -31,7 +29,7 @@ object Assignor {
     @JvmStatic private var app: Application? = null
     @JvmStatic private val cache :ICache by lazy { CacheImpl(File(app!!.filesDir,".assignor")) }
     @JvmStatic private var lifeObservers = ConcurrentHashMap<Int, BodyStore>()
-    @JvmStatic private var observables = ArrayMap<String, BodyStore>()
+    @JvmStatic private var stableStore = BodyStore(State_Resumed)
 
     @JvmStatic
     fun init(application: Application) {
@@ -84,33 +82,45 @@ object Assignor {
         }
     }
 
-    @Synchronized internal fun getStore(code: Int): BodyStore = lifeObservers[code] ?:
+    @Synchronized fun getStore(code: Int): BodyStore = lifeObservers[code] ?:
         BodyStore().apply {
             lifeObservers[code] = this
         }
 
     @JvmStatic
-    fun<T:BodyModel> of(activity: Activity,f:(T)->Unit):T {
+    fun<T:BodyModel> of(activity: Activity, f:(T)->Unit):T {
         activity.application?.apply {
             init(this)
         }
         return of(activity.hashCode(),f)
     }
 
-    /**
+    /** 同一个Activity只能有唯一个BodyDataContainer
      * @param code see [Activity.hashCode]
      */
     @JvmStatic
-    fun<T:BodyModel> of(code:Int,f:(T)->Unit):T = getStore(code).get(f)
+    fun<T:BodyModel> of(code:Int, f:(T)->Unit):T = getStore(code).get(f)
+
+    /** 同一个Activity有一个name名称BodyDataContainer(也就是Activity有多个name不同的BodyDataContainer)
+     * @param code see [Activity.hashCode]
+     */
+    @JvmStatic
+    fun<T:BodyModel> of(code:Int, name:String, f:(T)->Unit):T = getStore(code).get(f,name)
 
     @JvmStatic
-    fun<T:BodyModel> stable(name:String,f:(T)->Unit):T = (observables[name] ?:
-        BodyStore(State_Resumed).apply {
-                observables[name] = this
-        }).get(f)
+    fun<T:BodyModel> of(code:Int, cls:Class<T>):T = getStore(code).get(cls)
 
     @JvmStatic
-    fun disable(name:String) = observables.remove(name)?.onStateChanged(State_Destroy)
+    fun<T:BodyModel> of(code:Int, name:String, cls:Class<T>):T = getStore(code).get(cls,name)
+
+    @JvmStatic
+    fun<T:BodyModel> of(activity: Activity, cls:Class<T>):T = getStore(activity.hashCode()).get(cls)
+
+    @JvmStatic
+    fun<T:BodyModel> of(activity: Activity, name:String, cls:Class<T>):T = getStore(activity.hashCode()).get(cls,name)
+
+    @JvmStatic
+    fun getStore():BodyStore = stableStore
 
     @JvmStatic
     fun cache(parent : File): ICache = CacheImpl(parent)
@@ -118,11 +128,13 @@ object Assignor {
     @JvmStatic
     fun cache(): ICache = cache
 
+    @Suppress("UNCHECKED_CAST")
     @JvmStatic fun<T> parseJson(content:String?,f:(T)->Unit):T {
         return if(TypeConvert.convert(f) == String::class.java) content as T
                else parseJson(content?.let{ JsonParser().parse(content)},f)
     }
 
+    @Suppress("UNCHECKED_CAST")
     @JvmStatic fun<T> parseJson(element: JsonElement?, f:(T)->Unit):T{
         return element?.let {_->
             TypeConvert.convert(f)?.let {

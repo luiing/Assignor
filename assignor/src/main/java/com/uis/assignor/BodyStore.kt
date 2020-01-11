@@ -6,11 +6,11 @@
 
 package com.uis.assignor
 
-import android.support.v4.util.ArrayMap
+import androidx.collection.ArrayMap
 import com.uis.assignor.utils.TypeConvert
 
-internal class BodyStore(@Volatile var mState:Int = State_Created) :IState{
-    private var models:ArrayMap<String,BodyModel> = ArrayMap()
+class BodyStore(@Volatile var mState:Int = State_Created) :IState{
+    private var models: ArrayMap<String, BodyModel> = ArrayMap()
 
     override fun onStateChanged(state: Int) {
         mState = state
@@ -23,13 +23,21 @@ internal class BodyStore(@Volatile var mState:Int = State_Created) :IState{
     }
 
     @Suppress("UNCHECKED_CAST")
-    fun <T :BodyModel> get(f:(T)->Unit) :T {
-        val type = TypeConvert.convert(f)
-        val key = "BodyModel.default:".plus(type)
-        return (models[key] ?: (type as Class<out BodyModel>).newInstance().apply {
-            autoFindBodyModel()
+    fun <B :BodyModel> get(f:(B)->Unit, name:String="") :B =  getModel(TypeConvert.convert(f) as Class<out BodyModel>,name)as B
+
+    @Suppress("UNCHECKED_CAST")
+    fun <B :BodyModel> get(cls:Class<B>, name:String="") :B = getModel(cls,name) as B
+
+    fun remove(cls:Class<out BodyModel>, name:String="") = models.remove(getModelName(cls,name))
+
+    private fun getModel(cls:Class<out BodyModel>, name:String=""):BodyModel {
+        val key = getModelName(cls,name)
+        return models[key] ?: cls.newInstance().apply {
+            autoFindBodyData()
             if (State_Resumed == mState) onStateChanged(mState)
             models[key] = this
-        }) as T
+        }
     }
+
+    private fun getModelName(cls:Class<*>,name:String=""):String = "BodyDataContainer.default${name}:${cls.name}"
 }

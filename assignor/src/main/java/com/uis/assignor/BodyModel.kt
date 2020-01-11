@@ -6,7 +6,6 @@
 
 package com.uis.assignor
 
-import com.uis.assignor.utils.ALog
 import java.util.*
 
 /**
@@ -17,10 +16,10 @@ import java.util.*
  */
 open class BodyModel :IState{
     private val states = LinkedList<IState>()
-    private var destroyCall :(()->Unit)? = null
+    private var calls :MutableList<(()->Unit)> = ArrayList()
 
     /** 自动注册 [BodyData] [IState] */
-    internal fun autoFindBodyModel(cls :Class<*>? =javaClass){
+    internal fun autoFindBodyData(cls :Class<*>? =javaClass){
         cls?.let {
             for( field in it.declaredFields){
                 //ALog.e("field name ${field.name},${field.type},"+(field.type == BodyData::class.java))
@@ -33,7 +32,7 @@ open class BodyModel :IState{
                     }
                 }
             }
-            autoFindBodyModel(it.superclass)
+            autoFindBodyData(it.superclass)
         }
     }
 
@@ -55,15 +54,15 @@ open class BodyModel :IState{
         }
         if(State_Destroy == state){
             states.clear()
-            destroyCall?.apply {
-                this()
-                destroyCall = null
+            for (call in calls){
+                call()
             }
+            calls.clear()
         }
     }
 
     fun destroy(call :()->Unit){
-        destroyCall = call
+        calls.add(call)
     }
 
     fun addState(state :IState){

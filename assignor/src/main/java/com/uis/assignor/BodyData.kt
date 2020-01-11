@@ -1,7 +1,6 @@
 package com.uis.assignor
 
-import android.support.v4.util.ArrayMap
-import com.uis.assignor.utils.ALog
+import androidx.collection.ArrayMap
 import com.uis.assignor.works.Worker
 
 open class BodyData<T :Any> :IState{
@@ -48,6 +47,11 @@ open class BodyData<T :Any> :IState{
         return null
     }
 
+    /** 清除缓存值*/
+    @Synchronized fun clearValue(){
+        mValue = VALUE_NONE
+    }
+
     @Synchronized private fun notifyValue(){
         if(mValue != VALUE_NONE && State_Resumed == this.mState) {
             if (Worker.isMainThread()) {
@@ -81,12 +85,12 @@ open class BodyData<T :Any> :IState{
                     while (it.hasNext()){
                         val item = it.next()
                         if (item.version < mVersion && State_Resumed == mState) {
-                            item.observer(this as T)
                             if(VERSION_ONCE == item.version){
                                 it.remove()
                             }else{
                                 item.version = mVersion
                             }
+                            item.observer(this as T)
                         }
                     }
                 }
@@ -102,12 +106,26 @@ open class BodyData<T :Any> :IState{
         notifyValue()
     }
 
+    fun observerStartNow(observer: (T)->Unit){
+        val code = observer.hashCode()
+        if(!observers.containsKey(code)){
+            observers[code] = ItemObserver(mVersion,observer)
+        }
+    }
+
     fun observerOnce(observer: (T)->Unit){
         val code = observer.hashCode()
         if(!observers.containsKey(code)){
             observers[code] = ItemObserver(VERSION_ONCE,observer)
         }
         notifyValue()
+    }
+
+    fun observerOnceStartNow(observer: (T)->Unit){
+        val code = observer.hashCode()
+        if(!observers.containsKey(code)){
+            observers[code] = ItemObserver(mVersion,observer)
+        }
     }
 
     fun removeObserver(observer: (T)->Unit){
