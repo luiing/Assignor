@@ -2,8 +2,8 @@ apply plugin: 'java'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':call-annotation')
+    implementation project(':call-annotation')//'com.uis:call-annotation:0.0.1'
 }
 sourceCompatibility = "1.8"
 targetCompatibility = "1.8"
-//apply from: '../../bintray.gradle'
+//apply from: '../../../bintray.gradle'
