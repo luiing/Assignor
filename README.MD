@@ -3,11 +3,11 @@
 ### 新增支持注解组件化功能
 组件化原理介绍：具体的用法参看demo
 
-1.注解处理器：通过注解BindCall声明组件名称，注解处理器call-processor在编译前匹配后取到被注解的类，
+1.注解处理器：通过注解BindCall声明组件名称，注解处理器call-processor在编译前匹配到被注解的类，
 
 然后生成一个java源文件：里面有无参被注解的类的对象
 
-2.实现组件：实现接口com.uis.assignor.call.ICall
+2.实现组件：实现接口com.uis.assignor.call.ICall,同步和异步功能分开清晰逻辑
 
 3.调用组件：call-annotation中的方法BindCallUtils.getCallValue(),获取到被注解的类的对象，剩下的就是调用了
 
@@ -121,14 +121,13 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # 组件化框架使用
 
-    1.加入注解处理器:kapt支持kotlin代码扫码，也支持java代码
+    1.加入注解处理器:kapt支持kotlin代码注解处理器扫描，也支持java代码
         apply plugin: 'kotlin-kapt'
         dependencies {
             implementation 'com.uis:assignor:1.0.0'
             kapt 'com.uis:call-processor:0.0.1'
         }
     2.组件实现
-        
         @BindCall("Test")
         public class CoupleTest extends SimpleCall {
             @Override
@@ -175,16 +174,16 @@ Version|Descipt|Fixed|Time
 
 
 # License
-           Copyright [2019] uis
+Copyright [2020] uis
         
-           Licensed under the Apache License, Version 2.0 (the "License");
-           you may not use this file except in compliance with the License.
-           You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
         
-               http://www.apache.org/licenses/LICENSE-2.0
+     http://www.apache.org/licenses/LICENSE-2.0
         
-           Unless required by applicable law or agreed to in writing, software
-           distributed under the License is distributed on an "AS IS" BASIS,
-           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-           See the License for the specific language governing permissions and
-           limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
