@@ -1,5 +1,6 @@
 package com.uis.assignor.call;
 
+import android.content.Context;
 import android.text.TextUtils;
 
 import androidx.annotation.NonNull;
@@ -22,16 +23,16 @@ public final class Call {
     private static @Volatile int sCounter = 1;
 
     /**
-     * create Couple.Params
-     * @param coupleName
+     * create Call.Params
+     * @param callName
      * @return
      */
-    public static ParamsBuilder newParams(@NonNull String coupleName){
-        return new ParamsBuilder(coupleName);
+    public static ParamsBuilder newParams(@NonNull String callName){
+        return new ParamsBuilder(callName);
     }
 
     /**
-     * create Couple.Result
+     * create Call.Result
      * @param cid
      * @return
      */
@@ -118,8 +119,9 @@ public final class Call {
 
     public final static class Params {
 
-        public String coupleName;
-        public String coupleAction = "";
+        public String callName;
+        public String callAction = "";
+        public Context context;
         public int id = sCounter++;
         private JSONObject data;
 
@@ -131,11 +133,27 @@ public final class Call {
             return data == null ? new JSONObject() : data;
         }
 
+        public <T> T getItem(String key){
+            return (T)getData().opt(key);
+        }
+
+        public String getStringItem(String key){
+            return getData().optString(key,"");
+        }
+
+        public boolean getBooleanItem(String key){
+            return getData().optBoolean(key,false);
+        }
+
+        public int getIntItem(String key){
+            return getData().optInt(key,0);
+        }
+
         @Override
         public String toString() {
             return "Params{" +
-                    "coupleName='" + coupleName + '\'' +
-                    ", coupleAction='" + coupleAction + '\'' +
+                    "callName='" + callName + '\'' +
+                    ", callAction='" + callAction + '\'' +
                     ", id=" + id +
                     ", data=" + getData().toString() +
                     '}';
@@ -146,11 +164,16 @@ public final class Call {
         private Params param = new Params();
 
         private ParamsBuilder(@NonNull String name) {
-            param.coupleName = name;
+            param.callName = name;
         }
 
         public ParamsBuilder setAction(String action){
-            param.coupleAction = action;
+            param.callAction = action;
+            return this;
+        }
+
+        public ParamsBuilder setContext(Context context){
+            param.context = context;
             return this;
         }
 
@@ -174,41 +197,41 @@ public final class Call {
             if(call != null){
                 return call.onCall(param);
             }
-            return newResult(param.id).error(404,"Not found "+param.coupleName).build();
+            return newResult(param.id).error(404,"Not found "+param.callName).build();
         }
 
         public void call(IResult result){
-            final ICall iDecouple = getCall();
+            final ICall call = getCall();
             sResult.put(param.id,result);
-            if(iDecouple != null){
+            if(call != null){
                 Worker.ioExecute(new Function0<Unit>() {
                     @Override
                     public Unit invoke() {
-                        iDecouple.onCallback(param);
+                        call.onCallback(param);
                         return null;
                     }
                 });
             }else{
-                newResult(param.id).error(404,"Not found "+param.coupleName).build();
+                newResult(param.id).error(404,"Not found "+param.callName).build();
             }
         }
 
         private ICall getCall(){
-            ICall couple = null;
-            if(!TextUtils.isEmpty(param.coupleName)) {
-                WeakReference<ICall> ref = sCall.get(param.coupleName);
+            ICall call = null;
+            if(!TextUtils.isEmpty(param.callName)) {
+                WeakReference<ICall> ref = sCall.get(param.callName);
                 if (ref != null) {
-                    couple = ref.get();
+                    call = ref.get();
                 }
-                if (couple == null) {
-                    Object value = BindCallUtils.getCallValue(param.coupleName);
+                if (call == null) {
+                    Object value = BindCallUtils.getCallValue(param.callName);
                     if (value != null) {
-                        couple = (ICall) value;
-                        sCall.put(param.coupleName, new WeakReference<>(couple));
+                        call = (ICall) value;
+                        sCall.put(param.callName, new WeakReference<>(call));
                     }
                 }
             }
-            return couple;
+            return call;
         }
     }
 }
