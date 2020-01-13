@@ -1,5 +1,17 @@
-# Assignor 数据流架构(委托者)
+# Assignor 数据流架构+组件化
 
+### 新增支持注解组件化功能
+组件化原理介绍：具体的用法参看demo
+
+1.注解处理器：通过注解BindCall声明组件名称，注解处理器call-processor在编译前匹配到被注解的类，
+
+然后生成一个java源文件：里面有无参被注解的类的对象
+
+2.实现组件：实现接口com.uis.assignor.call.ICall,同步和异步功能分开清晰逻辑
+
+3.调用组件：call-annotation中的方法BindCallUtils.getCallValue(),获取到被注解的类的对象，剩下的就是调用了
+
+### 介绍
 BodyModel,BodyData提供数据流操作，支持缓存，支持自动释放资源，只有UI可见才更新
 
 BodyData数据调度隶属于BodyModel,每个Activity最多有一个同名BodyModel
@@ -13,7 +25,10 @@ Worker.mainExecute{} 主线程运行（内部异常处理）
 Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # Use
-    implementation 'com.uis:assignor:0.3.0'
+    implementation 'com.uis:assignor:1.0.0'
+    
+# Personal Maven
+    maven { url 'https://dl.bintray.com/sweet/maven'}    
     
 ### Model Data用法
 
@@ -104,6 +119,45 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
 ```
 
 
+# 组件化框架使用
+
+    1.加入注解处理器:kapt支持kotlin代码注解处理器扫描，也支持java代码
+        apply plugin: 'kotlin-kapt'
+        dependencies {
+            implementation 'com.uis:assignor:1.0.0'
+            kapt 'com.uis:call-processor:0.0.1'
+        }
+    2.组件实现
+        @BindCall("Test")
+        public class CoupleTest extends SimpleCall {
+            @Override
+            public void onCallback(Call.Params param) {//实现异步方法
+                SystemClock.sleep(2000);
+                Call.newResult(param.id).success().addParam("name",param.toString()).build();
+            }
+
+           @Override
+            public Call.Result onCall(Call.Params param) {//实现同步方法
+
+                return Call.newResult(param.id).success().addParam("name",param.toString()).build();
+            }
+        }
+    3.调用
+        //同步调用
+        Call.Result result = Call.newParams("Test")
+                    .setAction("a")
+                    .addParam("key","111")
+                    .call();
+        ALog.e(result.toString());
+        //异步调用
+            Call.newParams("Test")
+                    .setAction("b")
+                    .addParam("key","222").call(new IResult() {
+                @Override
+                public void onResult(Call.Result result) {
+                    ALog.e(result.toString());
+                }
+            });
 
 
 # Version
@@ -116,20 +170,20 @@ Version|Descipt|Fixed|Time
 0.2.4|增加BodyModel常驻方法,写文件缓存在子线程,兼容java和kotlin写法||2019/8
 0.2.5|支持activity存在多个同名BodyModel,需指定key||2019/9
 0.3.0|新增observerStartNow只监听新的回调，加入androidx||2019/12
-
+1.0.0|新增注解组件化功能||2020/1
 
 
 # License
-           Copyright [2019] uis
+Copyright [2020] uis
         
-           Licensed under the Apache License, Version 2.0 (the "License");
-           you may not use this file except in compliance with the License.
-           You may obtain a copy of the License at
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
         
-               http://www.apache.org/licenses/LICENSE-2.0
+     http://www.apache.org/licenses/LICENSE-2.0
         
-           Unless required by applicable law or agreed to in writing, software
-           distributed under the License is distributed on an "AS IS" BASIS,
-           WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-           See the License for the specific language governing permissions and
-           limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
