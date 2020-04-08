@@ -9,6 +9,9 @@ import android.widget.TextView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.uis.assignor.call.Call;
+import com.uis.assignor.call.IResult;
+import com.uis.assignor.utils.ALog;
 import com.uis.conn.viewmodel.MainView;
 import com.uis.conn.viewmodel.MainViewModel;
 import com.uis.connector.demo.R;
@@ -51,7 +54,31 @@ public class MainUi extends AppCompatActivity implements View.OnClickListener, M
             startActivity(new Intent(this,DemoUi.class));
         }else if(R.id.bt_read == id){
             viewModel.readBook();
+
+            Call.Result result = Call.newParams("Test")
+                    .setAction("a")
+                    .addParam("key","111")
+                    .call();
+            ALog.e(result.toString());
+            Call.newParams("Test")
+                    .setAction("b")
+                    .addParam("key","222").call(new IResult() {
+                @Override
+                public void onResult(Call.Result result) {
+                    ALog.e(result.toString());
+                }
+            });
+
         }else if(R.id.bt_write == id){
+            Call.Result result = Call.newParams("Assignor").call();
+            ALog.e(result.toString());
+            Call.newParams("Assignor").call(new IResult() {
+                @Override
+                public void onResult(Call.Result result) {
+                    ALog.e(result.toString());
+                }
+            });
+
             viewModel.writeBook();
         }else if(R.id.bt_remove_cache == id){
             viewModel.removeMemoryCache();
