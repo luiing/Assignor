@@ -1,3 +1,3 @@
-include ':demo',':assignor' , ':call-processor', ':call-annotation'
+include ':demo',':assignor' , ':call-processor', ':call-annotation','rotate3d'
 
 
