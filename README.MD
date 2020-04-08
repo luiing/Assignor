@@ -29,7 +29,10 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
     
 # Personal Maven
     maven { url 'https://dl.bintray.com/sweet/maven'}    
-    
+
+# 3D旋转【切换Activity或者View旋转效果】
+    implementation 'com.uis:rotate3d:0.0.1'
+
 ### Model Data用法
 
 ```
