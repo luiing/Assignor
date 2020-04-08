@@ -9,6 +9,11 @@ package com.uis.conn.ui
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
+import android.view.ViewGroup
+import android.view.Window
+import com.uis.anim.RotateCall
+import com.uis.anim.RotateUtils
 import com.uis.assignor.Assignor
 import com.uis.conn.model.DemoModel
 import com.uis.connector.demo.R
@@ -19,12 +24,11 @@ import kotlinx.android.synthetic.main.ui_demo.*
  * @date 2019-06-06
  * @github https://github.com/luiing
  */
-class DemoUi :Activity(){
+class DemoUi :Activity(), RotateCall {
 
     private val model = Assignor.of<DemoModel>(this){}
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        model.firstLoad()
         super.onCreate(savedInstanceState)
         setContentView(R.layout.ui_demo)
         bt_selt.setOnClickListener {
@@ -32,6 +36,7 @@ class DemoUi :Activity(){
         }
         bt_book.setOnClickListener {
             model.book()
+            firstRotate()
         }
         bt_book_list.setOnClickListener {
             model.booklist()
@@ -58,7 +63,37 @@ class DemoUi :Activity(){
         model.person.observer {
             display(it.toString())
         }
+        if (RotateUtils.isRotate(intent)) {
+            lastRotate()
+        }
     }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        Log.e("xx","onNewIntent....")
+        if (RotateUtils.isRotate(intent)) {
+            lastRotate()
+        }
+    }
+
+    override fun rotateNextPage() {
+        val intent = Intent(this,MainUi::class.java)
+        intent.putExtra(RotateCall.ROTATE,true)
+        startActivity(intent)
+        overridePendingTransition(0, 0)
+        lastRotate()
+    }
+
+    fun lastRotate(){
+        val vv = findViewById<ViewGroup>(Window.ID_ANDROID_CONTENT)
+        RotateUtils.applyLastRotation(vv, 90f, -0f)
+    }
+
+    fun firstRotate(){
+        val vv = findViewById<ViewGroup>(Window.ID_ANDROID_CONTENT)
+        RotateUtils.applyFirstRotation(this,vv,0f,-90f)
+    }
+
 
     private fun display(content: String){
         tv_content?.text = content
