@@ -25,7 +25,7 @@ Worker.mainExecute{} 主线程运行（内部异常处理）
 Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # Use
-    implementation 'com.uis:assignor:1.0.0'
+    implementation 'com.uis:assignor:1.0.1'
     
 # Personal Maven
     maven { url 'https://dl.bintray.com/sweet/maven'}    
@@ -163,7 +163,7 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
 # Version
 Version|Descipt|Fixed|Time
 ----|----|----|----
-0.0.1-CR1|预览版本| |2019/6
+0.0.1|初始版本| |2019/6
 0.0.2|增加BodyData.asyncValue()方法|缓存混淆|2019/6
 0.1.0|BodyModel支持懒加载||2019/7
 0.2.0|增加BodyData.observerOnce,范型新用法||2019/8
@@ -171,7 +171,7 @@ Version|Descipt|Fixed|Time
 0.2.5|支持activity存在多个同名BodyModel,需指定key||2019/9
 0.3.0|新增observerStartNow只监听新的回调，加入androidx||2019/12
 1.0.0|新增注解组件化功能||2020/1
-
+1.0.1|线程组优化,fixed startOnceStartNow||2020/3
 
 # License
 Copyright [2020] uis

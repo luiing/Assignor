@@ -8,9 +8,9 @@
         android:name="com.uis.conn.Dapp"
         android:theme="@style/AppTheme">
         <activity android:name="com.uis.conn.ui.MainUi"
-            >
+            android:launchMode="singleTask">
             <intent-filter>
-                <action android:name="android.intent.action.MAIN"/>
+                <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
