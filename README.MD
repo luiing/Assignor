@@ -25,7 +25,7 @@ Worker.mainExecute{} 主线程运行（内部异常处理）
 Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # Use
-    implementation 'com.uis:assignor:1.0.1'
+    implementation 'com.uis:assignor:1.0.2'
     
 # Personal Maven
     maven { url 'https://dl.bintray.com/sweet/maven'}    
@@ -175,6 +175,7 @@ Version|Descipt|Fixed|Time
 0.3.0|新增observerStartNow只监听新的回调，加入androidx||2019/12
 1.0.0|新增注解组件化功能||2020/1
 1.0.1|线程组优化,fixed startOnceStartNow||2020/3
+1.0.2|主线程任务统一使用Handler||2020/8
 
 # License
 Copyright [2020] uis
