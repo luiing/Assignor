@@ -5,6 +5,7 @@
  */
 
 package com.uis.assignor.works
+
 import android.os.Handler
 import android.os.Looper
 import java.util.concurrent.Executors
@@ -21,11 +22,7 @@ object Worker{
 
     @JvmStatic
     fun mainExecute(call :()->Unit,delay :Long=0L){
-        if(isMainThread() && delay <= 0){
-            mainCall(call)()
-        }else{
-            handler.postDelayed(mainCall(call) ,delay)
-        }
+        handler.postDelayed(mainCall(call) ,delay)
     }
 
     @JvmStatic

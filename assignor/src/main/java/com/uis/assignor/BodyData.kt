@@ -12,16 +12,8 @@ open class BodyData<T :Any> :IState{
     private data class ItemObserver<T>(var observer: (T)->Unit,var once:Boolean=false,var version:Int=VERSION_NONE)
     private val observers = ArrayMap<Int,ItemObserver<T>>()
     @Volatile private var mState = State_Created
-    @Volatile private var postValue :Any = VALUE_NONE
-    private var mValue :Any = VALUE_NONE
-    private var mVersion = VERSION_NONE
-    
-    @Suppress("UNCHECKED_CAST")
-    private val postCall :()->Unit = {
-        val v :Any = postValue
-        postValue = VALUE_NONE
-        setValue(v as T)
-    }
+    @Volatile private var mValue :Any = VALUE_NONE
+    @Volatile private var mVersion = VERSION_NONE
 
     override fun onStateChanged(state: Int) {
         this.mState = state
@@ -53,26 +45,17 @@ open class BodyData<T :Any> :IState{
 
     @Synchronized private fun notifyValue(){
         if(mValue != VALUE_NONE && State_Resumed == this.mState) {
-            if (Worker.isMainThread()) {
+            Worker.mainExecute({
                 notifyDataChanged()
-            } else {
-                Worker.mainExecute({
-                    notifyDataChanged()
-                })
-            }
+            })
         }
     }
 
     /** value更新，回调总是在主线程 */
     @Synchronized fun setValue(v :T){
-        if(Worker.isMainThread()) {
-            mVersion++
-            mValue = v
-            notifyDataChanged()
-        }else{
-            postValue = v
-            Worker.mainExecute(postCall)
-        }
+        mVersion++
+        mValue = v
+        notifyValue()
     }
 
     @Suppress("UNCHECKED_CAST")
