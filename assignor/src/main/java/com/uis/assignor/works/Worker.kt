@@ -22,7 +22,11 @@ object Worker{
 
     @JvmStatic
     fun mainExecute(call :()->Unit,delay :Long=0L){
-        handler.postDelayed(mainCall(call) ,delay)
+        if(isMainThread() && delay <= 0){
+            mainCall(call)()
+        }else{
+            handler.postDelayed(mainCall(call) ,delay)
+        }
     }
 
     @JvmStatic

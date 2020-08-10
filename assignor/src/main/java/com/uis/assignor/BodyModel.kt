@@ -61,6 +61,14 @@ open class BodyModel :IState{
         }
     }
 
+    fun removeObservers(){
+        for(item in states.iterator()){
+            if(item is BodyData<*>){
+                item.removeObservers()
+            }
+        }
+    }
+
     fun destroy(call :()->Unit){
         calls.add(call)
     }
