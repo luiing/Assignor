@@ -8,6 +8,7 @@ package com.uis.conn.ui
 
 import android.app.Activity
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
 import android.view.ViewGroup
@@ -18,6 +19,9 @@ import com.uis.assignor.Assignor
 import com.uis.conn.model.DemoModel
 import com.uis.connector.demo.R
 import kotlinx.android.synthetic.main.ui_demo.*
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.launch
 
 /**
  * @autho uis
@@ -65,6 +69,9 @@ class DemoUi :Activity(), RotateCall {
         }
         if (RotateUtils.isRotate(intent)) {
             lastRotate()
+        }
+        GlobalScope.launch{
+            async {  }
         }
     }
 
