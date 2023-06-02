@@ -8,50 +8,56 @@ package com.uis.conn.ui
 
 import android.app.Activity
 import android.content.Intent
-import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.View
 import android.view.ViewGroup
 import android.view.Window
+import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.uis.anim.RotateCall
 import com.uis.anim.RotateUtils
 import com.uis.assignor.Assignor
+import com.uis.assignor.utils.ALog
+import com.uis.conn.data.Book
+import com.uis.conn.kv.StorageManager
 import com.uis.conn.model.DemoModel
-import com.uis.connector.demo.R
-import kotlinx.android.synthetic.main.ui_demo.*
-import kotlinx.coroutines.GlobalScope
-import kotlinx.coroutines.async
-import kotlinx.coroutines.launch
+import com.uis.connector.demo.databinding.UiDemoBinding
+import kotlinx.coroutines.*
 
 /**
  * @autho uis
  * @date 2019-06-06
  * @github https://github.com/luiing
  */
-class DemoUi :Activity(), RotateCall {
+const val PI = 3.14
+class DemoUi :AppCompatActivity(), RotateCall {
 
     private val model = Assignor.of<DemoModel>(this){}
+    private lateinit var binding:UiDemoBinding
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.ui_demo)
-        bt_selt.setOnClickListener {
+        binding = UiDemoBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        binding.btSelt.setOnClickListener {
             startActivity(Intent(this,DemoUi::class.java))
         }
-        bt_book.setOnClickListener {
+        binding.btBook.setOnClickListener {
             model.book()
             firstRotate()
         }
-        bt_book_list.setOnClickListener {
+        binding.btBookList.setOnClickListener {
             model.booklist()
+            writeTest()
         }
-        bt_person.setOnClickListener {
+        binding.btPerson.setOnClickListener {
             model.person()
         }
-        bt_sync.setOnClickListener {
+        binding.btSync.setOnClickListener {
             model.syncCall()
         }
-        bt_async.setOnClickListener {
+        binding.btAsync.setOnClickListener {
             model.asyncCall()
         }
 
@@ -69,9 +75,6 @@ class DemoUi :Activity(), RotateCall {
         }
         if (RotateUtils.isRotate(intent)) {
             lastRotate()
-        }
-        GlobalScope.launch{
-            async {  }
         }
     }
 
@@ -103,7 +106,33 @@ class DemoUi :Activity(), RotateCall {
 
 
     private fun display(content: String){
-        tv_content?.text = content
+        binding.tvContent.text = content
     }
 
+    val storage = StorageManager(this)
+
+    fun writeTest(){
+        lifecycleScope.launchWhenCreated {
+            withContext(Dispatchers.IO) {
+                storage.getDataStore()
+                var t = System.currentTimeMillis()
+                storage.dsWrite()
+                costTime("dataStore",t)
+
+
+                t = System.currentTimeMillis()
+                storage.mmkvWrite()
+                costTime("mmkv",t)
+
+
+                t = System.currentTimeMillis()
+                storage.spWrite()
+                costTime("sp",t)
+            }
+        }
+    }
+
+    fun costTime(tag:String,t:Long){
+        ALog.e("$tag cost ${System.currentTimeMillis()-t}")
+    }
 }

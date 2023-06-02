@@ -20,3 +20,9 @@ class AssignorDecouple : SimpleCall() {
         return Call.newResult(param.id).success().build()
     }
 }
+
+object DataProviderManager {
+    fun registerDataProvider(provider: String) {
+        // ...
+    }
+}
