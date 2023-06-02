@@ -1,7 +1,7 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
+//apply plugin: 'androidx.benchmark'
 
 android {
     compileSdkVersion compileVer
@@ -12,8 +12,14 @@ android {
         targetSdkVersion compileVer
         versionCode 1
         versionName "1.0"
+        //testInstrumentationRunner  "com.uis.conn.MainTestRunner"
+        //testInstrumentationRunner  "androidx.benchmark.junit4.AndroidBenchmarkRunner"
+        // Enable measuring on an emulator, or devices with low battery
+        //testInstrumentationRunnerArgument 'androidx.benchmark.suppressErrors', 'EMULATOR,LOW_BATTERY'
     }
-
+    buildFeatures {
+        viewBinding = true
+    }
     buildTypes {
         release {
             minifyEnabled true
@@ -21,15 +27,46 @@ android {
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    kotlinOptions {
+        // work-runtime-ktx 2.1.0 and above now requires Java 8
+        jvmTarget = "1.8"
+
+        // Enable Coroutines and Flow APIs
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.FlowPreview"
+    }
+    packagingOptions {
+        // Multiple dependency bring these files in. Exclude them to enable
+        // our test APK to build (has no effect on our AARs)
+        excludes += "/META-INF/AL2.0"
+        excludes += "/META-INF/LGPL2.1"
+    }
 }
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     api 'com.google.android.material:material:'+supportVer
+    implementation "com.tencent:mmkv-static:$mmkv"
+    implementation "androidx.constraintlayout:constraintlayout:2.0.4"
+//    implementation("androidx.datastore:datastore:1.0.0-alpha08"){
+//        exclude group:'org.jetbrains.kotlinx',module:'kotlinx-coroutines-core-jvm'
+//    }
+    implementation ("androidx.datastore:datastore-preferences:1.0.0-alpha08"){
+        exclude group:'org.jetbrains.kotlinx',module:'kotlinx-coroutines-core-jvm'
+    }
     api 'androidx.legacy:legacy-support-v4:'+supportVer
     api "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
-    //implementation 'com.facebook.fresco:fresco:1.11.0'
-    implementation project(':assignor')//'com.uis:assignor:1.0.0'//
+    api "androidx.paging:paging-runtime-ktx:$pagingVersion"
     implementation project(':rotate3d')
-    kapt 'com.uis:call-processor:0.0.1'//project(':call-processor')
+    testImplementation 'junit:junit:4.12'
+    //androidTestImplementation "androidx.benchmark:benchmark-junit4:1.0.0"
+//    androidTestImplementation "org.jetbrains.kotlinx:kotlinx-coroutines-test:1.4.1"
+
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:$coroutines"
+    implementation "org.jetbrains.kotlinx:kotlinx-coroutines-core-jvm:$coroutines"
+
+    implementation "io.github.luiing:assignor:$assignor"
+    implementation "io.github.luiing:call-annotation:$assignor"
+    kapt "io.github.luiing:call-processor:$assignor"
 }

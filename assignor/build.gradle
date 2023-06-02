@@ -1,6 +1,9 @@
-apply plugin: 'com.android.library'
-apply plugin: 'kotlin-android'
-apply plugin: 'kotlin-kapt'
+plugins{
+    id 'com.android.library'
+    id 'kotlin-android'
+    id 'kotlin-kapt'
+}
+
 
 android {
     compileSdkVersion compileVer
@@ -27,7 +30,7 @@ dependencies {
     compileOnly 'androidx.legacy:legacy-support-v4:'+supportVer
     compileOnly "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
     api "com.google.code.gson:gson:$gsonVer"
-    api 'com.uis:call-annotation:0.0.1'
+    api project(':call-annotation')
 }
 
-//apply from: '../../../bintray.gradle'
+//apply from: '../../publish.gradle'

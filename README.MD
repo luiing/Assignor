@@ -1,31 +1,33 @@
 # Assignor 数据流架构+组件化
 
 ### 新增支持注解组件化功能
-组件化原理介绍：具体的用法参看demo
+    组件化原理介绍：具体的用法参看demo
 
-1.注解处理器：通过注解BindCall声明组件名称，注解处理器call-processor在编译前匹配到被注解的类，
+    1.注解处理器：通过注解BindCall声明组件名称，注解处理器call-processor在编译前匹配到被注解的类，
 
-然后生成一个java源文件：里面有无参被注解的类的对象
+    然后生成一个java源文件：里面有无参被注解的类的对象
 
-2.实现组件：实现接口com.uis.assignor.call.ICall,同步和异步功能分开清晰逻辑
+    2.实现组件：实现接口com.uis.assignor.call.ICall,同步和异步功能分开清晰逻辑
 
-3.调用组件：call-annotation中的方法BindCallUtils.getCallValue(),获取到被注解的类的对象，剩下的就是调用了
+    3.调用组件：call-annotation中的方法BindCallUtils.getCallValue(),获取到被注解的类的对象，剩下的就是调用了
 
 ### 介绍
-BodyModel,BodyData提供数据流操作，支持缓存，支持自动释放资源，只有UI可见才更新
+    BodyModel,BodyData提供数据流操作，支持缓存，支持自动释放资源，只有UI可见才更新
 
-BodyData数据调度隶属于BodyModel,每个Activity最多有一个同名BodyModel
+    BodyData数据调度隶属于BodyModel,每个Activity最多有一个同名BodyModel
 
-IAsyncWork提供异步线程任务，且支持数量设置和结果回调
+    IAsyncWork提供异步线程任务，且支持数量设置和结果回调
 
-ISyncWork提供同步线程组任务，且支持数量设置和结果回调
+    ISyncWork提供同步线程组任务，且支持数量设置和结果回调
 
-Worker.mainExecute{} 主线程运行（内部异常处理）
+    Worker.mainExecute{} 主线程运行（内部异常处理）
 
-Worker.ioExecute{} 子线程运行（内部异常处理）
+    Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # Use
-    implementation 'com.uis:assignor:1.0.3'
+    implementation 'io.github.luiing:assignor:1.0.0'
+    implementation 'io.github.luiing:call-annotation:1.0.0'
+    kapt 'io.github.luiing:call-processor:1.0.0'
     
 # Personal Maven
     maven { url 'https://dl.bintray.com/sweet/maven'}    
@@ -127,8 +129,9 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
     1.加入注解处理器:kapt支持kotlin代码注解处理器扫描，也支持java代码
         apply plugin: 'kotlin-kapt'
         dependencies {
-            implementation 'com.uis:assignor:1.0.0'
-            kapt 'com.uis:call-processor:0.0.1'
+            implementation 'io.github.luiing:assignor:1.0.0'
+            implementation 'io.github.luiing:call-annotation:1.0.0'
+            kapt 'io.github.luiing:assignor:call-processor:1.0.0'
         }
     2.组件实现
         @BindCall("Test")
@@ -164,22 +167,13 @@ Worker.ioExecute{} 子线程运行（内部异常处理）
 
 
 # Version
-Version|Descipt|Fixed|Time
-----|----|----|----
-0.0.1|初始版本| |2019/6
-0.0.2|增加BodyData.asyncValue()方法|缓存混淆|2019/6
-0.1.0|BodyModel支持懒加载||2019/7
-0.2.0|增加BodyData.observerOnce,范型新用法||2019/8
-0.2.4|增加BodyModel常驻方法,写文件缓存在子线程,兼容java和kotlin写法||2019/8
-0.2.5|支持activity存在多个同名BodyModel,需指定key||2019/9
-0.3.0|新增observerStartNow只监听新的回调，加入androidx||2019/12
-1.0.0|新增注解组件化功能||2020/1
-1.0.1|线程组优化,fixed startOnceStartNow||2020/3
-1.0.2|主线程任务统一使用Handler||2020/8
-1.0.3|主线程任务不统一使用Handler||2020/8
+| Version | Descipt         | Fixed | Time   |
+|---------|-----------------|-------|--------|
+| 1.0.0   | 切换到mavenCentral |       | 2023/6 | |
+
 
 # License
-Copyright [2020] uis
+Copyright [2023] uis
         
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.

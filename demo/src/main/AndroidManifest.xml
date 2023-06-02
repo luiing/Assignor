@@ -1,21 +1,26 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     package="com.uis.connector.demo">
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
     <application
         android:label="@string/app_name"
         android:name="com.uis.conn.Dapp"
         android:theme="@style/AppTheme">
+
         <activity android:name="com.uis.conn.ui.MainUi"
-            android:launchMode="singleTask">
+            android:launchMode="singleTask"
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER"/>
                 <action android:name="android.intent.action.VIEW"/>
             </intent-filter>
         </activity>
-        <activity android:name="com.uis.conn.ui.DemoUi"
-            />
+
+        <activity android:name="com.uis.conn.ui.DemoUi" />
     </application>
 </manifest>

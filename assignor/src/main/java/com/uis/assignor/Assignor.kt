@@ -19,13 +19,12 @@ import java.io.File
 import java.util.concurrent.ConcurrentHashMap
 
 /**
- * @autho uis
+ * @author uis
  * @date 2019-06-09
  * @github https://github.com/luiing
  */
 
 object Assignor {
-
     @JvmStatic private var app: Application? = null
     @JvmStatic private val cache :ICache by lazy { CacheImpl(File(app!!.filesDir,".assignor")) }
     @JvmStatic private var lifeObservers = ConcurrentHashMap<Int, BodyStore>()
@@ -33,44 +32,45 @@ object Assignor {
 
     @JvmStatic
     fun init(application: Application) {
-        app ?: {
-            synchronized(this) {
-                app ?: {
-                    app = application
-                    application.registerActivityLifecycleCallbacks(object : ActLifecycle() {
-                        override fun onActivityCreated(activity: Activity?, savedInstanceState: Bundle?) {
-                            activity?.hashCode()?.apply {
-                                stateChange(this, State_Created)
-                            }
+        app ?: synchronized(this) {
+            app ?: run {
+                app = application
+                application.registerActivityLifecycleCallbacks(object : ActLifecycle() {
+                    override fun onActivityCreated(
+                        activity: Activity,
+                        savedInstanceState: Bundle?
+                    ) {
+                        activity.hashCode().apply {
+                            this@Assignor.stateChange(this, State_Created)
                         }
+                    }
 
-                        override fun onActivityResumed(activity: Activity?) {
-                            activity?.hashCode()?.apply {
-                                stateChange(this, State_Resumed)
-                            }
+                    override fun onActivityResumed(activity: Activity) {
+                        activity.hashCode().apply {
+                            this@Assignor.stateChange(this, State_Resumed)
                         }
+                    }
 
-                        override fun onActivityPaused(activity: Activity?) {
-                            activity?.hashCode()?.apply {
-                                stateChange(this, State_Paused)
-                            }
+                    override fun onActivityPaused(activity: Activity) {
+                        activity.hashCode().apply {
+                            this@Assignor.stateChange(this, State_Paused)
                         }
+                    }
 
-                        override fun onActivitySaveInstanceState(activity: Activity?, outState: Bundle?) {
-                            activity?.hashCode()?.apply {
-                                stateChange(this, State_SaveInstance)
-                            }
+                    override fun onActivitySaveInstanceState(activity: Activity, outState: Bundle) {
+                        activity.hashCode().apply {
+                            this@Assignor.stateChange(this, State_SaveInstance)
                         }
+                    }
 
-                        override fun onActivityDestroyed(activity: Activity?) {
-                            activity?.hashCode()?.apply {
-                                stateChange(this, State_Destroy)
-                            }
+                    override fun onActivityDestroyed(activity: Activity) {
+                        activity.hashCode().apply {
+                            this@Assignor.stateChange(this, State_Destroy)
                         }
-                    })
-                }()
+                    }
+                })
             }
-        }()
+        }
     }
 
     internal fun stateChange(code: Int, state: Int) {
@@ -131,19 +131,19 @@ object Assignor {
     @Suppress("UNCHECKED_CAST")
     @JvmStatic fun<T> parseJson(content:String?,f:(T)->Unit):T {
         return if(TypeConvert.convert(f) == String::class.java) content as T
-               else parseJson(content?.let{ JsonParser().parse(content)},f)
+               else parseJson(content?.let{ JsonParser.parseString(content)},f)
     }
 
     @Suppress("UNCHECKED_CAST")
     @JvmStatic fun<T> parseJson(element: JsonElement?, f:(T)->Unit):T{
-        return element?.let {_->
+        return element?.let { _ ->
             TypeConvert.convert(f)?.let {
-                if(it == String::class.java){
+                if (it == String::class.java) {
                     element.toString() as T
-                }else{
+                } else {
                     Gson().fromJson(element, it)
                 }
             }
-        } ?: null as T
+        } ?: (null as T)
     }
 }

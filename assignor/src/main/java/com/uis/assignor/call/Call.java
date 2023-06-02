@@ -105,12 +105,9 @@ public final class Call {
         public Result build(){
             final IResult iResult = sResult.remove(result.id);
             if(iResult != null){
-                Worker.mainExecute(new Function0<Unit>() {
-                    @Override
-                    public Unit invoke() {
-                        iResult.onResult(result);
-                        return null;
-                    }
+                Worker.mainExecute(() -> {
+                    iResult.onResult(result);
+                    return null;
                 },0);
             }
             return result;
@@ -204,12 +201,9 @@ public final class Call {
             final ICall call = getCall();
             sResult.put(param.id,result);
             if(call != null){
-                Worker.ioExecute(new Function0<Unit>() {
-                    @Override
-                    public Unit invoke() {
-                        call.onCallback(param);
-                        return null;
-                    }
+                Worker.ioExecute(() -> {
+                    call.onCallback(param);
+                    return null;
                 });
             }else{
                 newResult(param.id).error(404,"Not found "+param.callName).build();

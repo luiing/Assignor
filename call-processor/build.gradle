@@ -2,8 +2,12 @@ apply plugin: 'java'
 
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
-    implementation project(':call-annotation')//'com.uis:call-annotation:0.0.1'
+    implementation "io.github.luiing:call-annotation:$assignor"
 }
-sourceCompatibility = "1.8"
-targetCompatibility = "1.8"
-//apply from: '../../../bintray.gradle'
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_1_8
+    targetCompatibility = JavaVersion.VERSION_1_8
+}
+
+//apply from: '../../publish.gradle'

@@ -11,9 +11,9 @@ object FileUtils {
     /** 删除文件目录下所有文件 */
     @JvmStatic fun removeFileDirectory(root: File){
         kotlin.runCatching {
-            for (name in root.list()) {
+            for (name in root.list()!!) {
                 val file = File(root, name)
-                if (file.isDirectory()) {
+                if (file.isDirectory) {
                     removeFileDirectory(file)
                 }
                 file.delete()
