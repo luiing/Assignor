@@ -25,12 +25,16 @@
     Worker.ioExecute{} 子线程运行（内部异常处理）
 
 # Use
-
     implementation 'io.github.luiing:assignor:1.0.0'
     implementation 'io.github.luiing:call-annotation:1.0.0'
     kapt 'io.github.luiing:call-processor:1.0.0'
-     
     
+# Personal Maven
+    maven { url 'https://dl.bintray.com/sweet/maven'}    
+
+# 3D旋转【切换Activity或者View旋转效果】
+    implementation 'com.uis:rotate3d:0.0.1'
+
 ### Model Data用法
 
 ```
@@ -166,6 +170,7 @@
 | Version | Descipt         | Fixed | Time   |
 |---------|-----------------|-------|--------|
 | 1.0.0   | 切换到mavenCentral |       | 2023/6 | |
+
 
 # License
 Copyright [2023] uis
